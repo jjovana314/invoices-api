@@ -1,0 +1,7 @@
+flask
+bcrypt
+pymongo
+flask_restful
+flask_jwt_extended
+Werkzeug
+jsonschema
