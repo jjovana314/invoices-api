@@ -1,7 +1,0 @@
-04.04.2021.
-~~~~~~~~~~~
-
-Do sada smo napravili json shemu za logovanje i generisali login klasu uz pomoc flask_restful framework-a
-Potrebno je da testiramo login klasu i da hendlujemo izuzetke koji se javljaju kad se na primer ne posalju svi potrebni podaci ili validacija sheme nije
-dobra
-
