@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 from pymongo import MongoClient
 from flask_jwt_extended import create_access_token, create_refresh_token, JWTManager
+import exceptions
 import login
 import schema_validation
 
@@ -52,29 +53,34 @@ class Login(Resource):
             }
         )
 
-    # we should return token, date and time and refresh token
-
 
 class Register(Resource):
     def post(self):
         global format_issue_date
         posted_data = request.get_json()    # this is list with dictionaries
         id_invoices = []
-        result_dict = dict()
+
         liability = dict()
         liability_error = dict()        # this is null if we got no errors
+        liability_error["InvoiceNumber"] = []
+
+        result_dict = dict()
+
         for curr_invoice in posted_data:
-            schema_validation.schema_generator(curr_invoice, "schema_register")
-            issue_date = curr_invoice.get("IssueDate")
+            try:
+                schema_validation.schema_generator(curr_invoice, "schema_register")
+            except exceptions.SchemaError as ex:
+                liability_error["SchemaError"] = ex[0]
+
+            issue_date = curr_invoice["IssueDate"]
+            invoice_number = curr_invoice["InvoiceNumber"]
 
             try:
                 date_formated = validate_date_time(format_issue_date, issue_date)
             except ValueError as ex:
-                liability_error["InvoiceNumber"] = curr_invoice.get("InvoiceNumber")
+                liability_error["InvoiceNumber"].append(invoice_number)
             else:
-                id_invoices.append(curr_invoice.get("InvoiceNumber"))
-
-        
+                id_invoices.append(invoice_number)
 
 
 api.add_resource(Login, "/api/login")
