@@ -1,4 +1,4 @@
-from json import loads, dumps
+from json import load, dumps, loads
 from jsonschema import ValidationError, validate
 import exceptions
 
@@ -17,9 +17,10 @@ def validate_schema(server_data: dict) -> None:
     """
     # we want json data, so we have to dump our data into json string
     data = dumps(server_data)
+    global schema
     try:
         # try to do validation for our json data
-        validate(loads(data), schema_login)
+        validate(loads(data), schema)
     except ValidationError as ex:
         ex_str = str(ex)
         for idx, value in enumerate(exceptions.schema_errors):
@@ -33,5 +34,5 @@ def schema_generator(data: dict, schema_file_name: str) -> None:
     global schema
     schema_file_ext = schema_file_name + ".json"
     with open(schema_file_ext) as f:
-        schema = loads(f)
+        schema = load(f)
     validate_schema(data)
