@@ -80,24 +80,25 @@ class Register(Resource):
                 schema_validation.schema_generator(curr_invoice, "schema_register")
             except exceptions.SchemaError as ex:
                 liability_error["SchemaError"] = ex.args[0]
-
-            issue_date = curr_invoice["IssueDate"]
-            invoice_number = curr_invoice["InvoiceNumber"]
-            idf_list.append(invoice_number)
-
-            try:
-                date_formated = register.validate_date_time(format_issue_date, issue_date)
-            except ValueError:
-                liability_error["InvoiceNumber"].append(invoice_number)
             else:
-                liability["InvoiceNumber"].append(invoice_number)
-        
-        if len(list(liability_error.values())) == 0:
-            liability_error = None
 
-        result_dict["liability"] = liability
-        result_dict["liabilityError"] = liability_error
-        result_dict["IDFList"] = idf_list
+                issue_date = curr_invoice["IssueDate"]
+                invoice_number = curr_invoice["InvoiceNumber"]
+                idf_list.append(invoice_number)
+
+                try:
+                    date_formated = register.validate_date_time(format_issue_date, issue_date)
+                except ValueError:
+                    liability_error["InvoiceNumber"].append(invoice_number)
+                else:
+                    liability["InvoiceNumber"].append(invoice_number)
+            
+            if len(list(liability_error.values())) == 0:
+                liability_error = None
+
+            result_dict["liability"] = liability
+            result_dict["liabilityError"] = liability_error
+            result_dict["IDFList"] = idf_list
         return result_dict
 
 
