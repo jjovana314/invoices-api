@@ -1,0 +1,9 @@
+{
+    "type": "object",
+    "properties": {
+        "InvoiceId": {"type": "string"},
+        "AssignmentContractNumber": {"type": "string"},
+        "DebtorCompanyName": {"type": "string"}
+    },
+    "required": ["InvoiceId", "AssignmentContractNumber", "DebtorCompanyName"]
+}
