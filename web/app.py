@@ -114,7 +114,7 @@ def validate_date_caller(data):
         liability["InvoiceNumber"].append(invoice_number)
 
 
-class Assign(Register):
+class Assign(Resource):
     def post(self):
         server_data = request.get_json()
         for invoice in server_data:
@@ -124,6 +124,16 @@ class Assign(Register):
                 return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
         return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
 
+
+class CancelAssign(Resource):
+    def post(self):
+        server_data = request.get_json()
+        try:
+            schema_validation.schema_generator(server_data, "schema_cancel_assign")
+        except exceptions.SchemaError:
+            return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
+        return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
+        
 
 api.add_resource(Login, "/api/login")
 api.add_resource(Register, "/api/invoice/register")
