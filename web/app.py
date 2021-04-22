@@ -11,6 +11,7 @@ import register
 
 
 # todo: token should last only 20 minutes
+# todo: test and refactor code
 
 
 app = Flask(__name__)
