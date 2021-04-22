@@ -1,0 +1,8 @@
+{
+    "type": "object",
+    "properties": {
+        "InvoiceId": {"type": "string"},
+        "cancelComments": {"type": "string"}
+    },
+    "required": ["InvoiceId", "cancelComments"]
+}
