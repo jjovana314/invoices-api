@@ -61,6 +61,7 @@ liability_error = dict()
 
 
 class Register(Resource):
+    """ Register invoices. """
     def post(self):
         global format_issue_date
         posted_data = request.get_json()    # this is list with dictionaries
@@ -99,7 +100,12 @@ class Register(Resource):
         return result_dict
 
 
-def validate_date_caller(data):
+def validate_date_caller(data: dict) -> None:
+    """ Date validation and liability dictionaries update.
+
+    Arguments:
+        data {dict} -- server data
+    """
     global liability
     global liability_error
     global format_issue_date
@@ -115,6 +121,7 @@ def validate_date_caller(data):
 
 
 class Assign(Resource):
+    """ Assign invoice. """
     def post(self):
         server_data = request.get_json()
         for invoice in server_data:
@@ -126,6 +133,7 @@ class Assign(Resource):
 
 
 class CancelAssign(Resource):
+    """ Cancel assignation. """
     def post(self):
         server_data = request.get_json()
         try:
