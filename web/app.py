@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 from pymongo import MongoClient
 from flask_jwt_extended import create_access_token, create_refresh_token, JWTManager
+from http import HTTPStatus
 import exceptions
 import login
 import schema_validation
@@ -55,15 +56,18 @@ class Login(Resource):
         )
 
 
+liability = dict()
+liability_error = dict()
+
+
 class Register(Resource):
     def post(self):
         global format_issue_date
         posted_data = request.get_json()    # this is list with dictionaries
         id_invoices = []
         max_invoices_request = 1000
-
-        liability = dict()
-        liability_error = dict()        # this is null if we got no errors
+        global liability
+        global liability_error
         liability_error["InvoiceNumber"] = []
         liability["InvoiceNumber"] = []
         liability_error["LimitError"] = None
@@ -86,13 +90,6 @@ class Register(Resource):
                 invoice_number = curr_invoice["InvoiceNumber"]
                 idf_list.append(invoice_number)
 
-                try:
-                    date_formated = register.validate_date_time(format_issue_date, issue_date)
-                except ValueError:
-                    liability_error["InvoiceNumber"].append(invoice_number)
-                else:
-                    liability["InvoiceNumber"].append(invoice_number)
-            
             if len(list(liability_error.values())) == 0:
                 liability_error = None
 
@@ -100,6 +97,31 @@ class Register(Resource):
             result_dict["liabilityError"] = liability_error
             result_dict["IDFList"] = idf_list
         return result_dict
+
+
+def validate_date_caller(data):
+    global liability
+    global liability_error
+    global format_issue_date
+    issue_date = data["IssueDate"]
+    invoice_number = data["InvoiceNumber"]
+
+    try:
+        date_formated = register.validate_date_time(format_issue_date, issue_date)
+    except ValueError:
+        liability_error["InvoiceNumber"].append(invoice_number)
+    else:
+        liability["InvoiceNumber"].append(invoice_number)
+
+
+class Assign(Register):
+    def post(self):
+        server_data = request.get_json()
+        try:
+            schema_validation.schema_generator(server_data, "schema_assign")
+        except exceptions.SchemaError:
+            return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
+        return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
 
 
 api.add_resource(Login, "/api/login")
