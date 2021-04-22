@@ -117,10 +117,11 @@ def validate_date_caller(data):
 class Assign(Register):
     def post(self):
         server_data = request.get_json()
-        try:
-            schema_validation.schema_generator(server_data, "schema_assign")
-        except exceptions.SchemaError:
-            return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
+        for invoice in server_data:
+            try:
+                schema_validation.schema_generator(invoice, "schema_assign")
+            except exceptions.SchemaError:
+                return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
         return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
 
 
