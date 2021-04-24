@@ -144,10 +144,22 @@ class CancelAssign(Resource):
         return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
 
 
+class Cancel(Resource):
+    """ Cancel invoice. """
+    def post(self):
+        server_data = request.get_json()
+        try:
+            schema_validation.schema_generator(server_data, "schema_cancel")
+        except exceptions.SchemaError:
+            return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
+        return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
+
+
 api.add_resource(Login, "/api/login")
 api.add_resource(Register, "/api/invoice/register")
 api.add_resource(Assign, "/api/invoice/assign")
 api.add_resource(CancelAssing, "/api/invoice/cancel-assign")
+api.add_resource(Cancel, "/api/invoice/cancel")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
