@@ -142,10 +142,12 @@ class CancelAssign(Resource):
         except exceptions.SchemaError:
             return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
         return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
-        
+
 
 api.add_resource(Login, "/api/login")
 api.add_resource(Register, "/api/invoice/register")
+api.add_resource(Assign, "/api/invoice/assign")
+api.add_resource(CancelAssing, "/api/invoice/cancel-assign")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
