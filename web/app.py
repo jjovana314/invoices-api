@@ -121,38 +121,39 @@ def validate_date_caller(data: dict) -> None:
         liability["InvoiceNumber"].append(invoice_number)
 
 
+def validate_schema_caller(data_validation, schema_name):
+    try:
+        schema_validation.schema_generator(data_validation, schema_name)
+    except exceptions.SchemaError:
+        return "Schema is not valid", HTTPStatus.BAD_REQUEST
+    else:
+        return "Data is valid", HTTPStatus.OK
+
+
 class Assign(Resource):
     """ Assign invoice. """
     def post(self):
         server_data = request.get_json()
+    
         for invoice in server_data:
-            try:
-                schema_validation.schema_generator(invoice, "schema_assign")
-            except exceptions.SchemaError:
-                return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
-        return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
+            message, code = validate_schema_caller(invoice, "schema_assign")
+        return jsonify("Message": message, "Code": code)
 
 
 class CancelAssign(Resource):
     """ Cancel assignation. """
     def post(self):
         server_data = request.get_json()
-        try:
-            schema_validation.schema_generator(server_data, "schema_cancel_assign")
-        except exceptions.SchemaError:
-            return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
-        return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
+        message, code = validate_schema_caller(server_data, "schema_cancel_assign")
+        return jsonify("Message": message, "Code": code)
 
 
 class Cancel(Resource):
     """ Cancel invoice. """
     def post(self):
         server_data = request.get_json()
-        try:
-            schema_validation.schema_generator(server_data, "schema_cancel")
-        except exceptions.SchemaError:
-            return jsonify("Message": "Schema is not valid", "Code": HTTPStatus.BAD_REQUEST)
-        return jsonify("Message": "Data is valid", "Code": HTTPStatus.OK)
+        message, code = validate_schema_caller(server_data, "schema_cancel")
+        return jsonify("Message": message, "Code": code)
 
 
 api.add_resource(Login, "/api/login")
