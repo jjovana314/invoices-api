@@ -1,6 +1,6 @@
 # from flask_restful import Resource, Api
 from flask import Flask, jsonify, request
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
 from flask_jwt_extended import create_access_token, create_refresh_token, JWTManager
 from http import HTTPStatus
@@ -28,6 +28,13 @@ users = db["Users"]
 Unauthenticated = 401
 invalid_login_counter = 0
 format_issue_date = "%Y-%m-%d"
+
+
+class InvoiceDetails(Resource):
+    def get(self, idf):
+        status = dict()
+        liability_invoice_details = dict()
+        invoices.find({"InvoiceId": idf}[0])
 
 
 class Login(Resource):
@@ -98,6 +105,7 @@ class Register(Resource):
             result_dict["liability"] = liability
             result_dict["liabilityError"] = liability_error
             result_dict["IDFList"] = idf_list
+            invoices.insert(curr_invoice)
         return result_dict
 
 
@@ -137,7 +145,7 @@ class Assign(Resource):
     
         for invoice in server_data:
             message, code = validate_schema_caller(invoice, "schema_assign")
-        return jsonify("Message": message, "Code": code)
+        return jsonify({"Message": message, "Code": code})
 
 
 class CancelAssign(Resource):
@@ -145,7 +153,7 @@ class CancelAssign(Resource):
     def post(self):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_cancel_assign")
-        return jsonify("Message": message, "Code": code)
+        return jsonify({"Message": message, "Code": code})
 
 
 class Cancel(Resource):
@@ -153,14 +161,15 @@ class Cancel(Resource):
     def post(self):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_cancel")
-        return jsonify("Message": message, "Code": code)
+        return jsonify({"Message": message, "Code": code})
 
 
 api.add_resource(Login, "/api/login")
 api.add_resource(Register, "/api/invoice/register")
 api.add_resource(Assign, "/api/invoice/assign")
-api.add_resource(CancelAssing, "/api/invoice/cancel-assign")
+api.add_resource(CancelAssign, "/api/invoice/cancel-assign")
 api.add_resource(Cancel, "/api/invoice/cancel")
+api.add_resource(InvoiceDetails, "/api/invoice/<string:idf>", endpoint="invoice")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
