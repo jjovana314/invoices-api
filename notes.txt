@@ -1,0 +1,77 @@
+04.04.2021.
+~~~~~~~~~~~
+
+Do sada smo napravili json shemu za logovanje i generisali login klasu uz pomoc flask_restful framework-a
+Potrebno je da testiramo login klasu i da hendlujemo izuzetke koji se javljaju kad se na primer ne posalju svi potrebni podaci ili validacija sheme nije
+dobra
+
+
+12.04.2021.
+~~~~~~~~~~~
+
+1. Definisati sta predstavlja liability i liability_error objekat
+2. Odrediti sve greske koje treba da se hendluju i nacin na koji ce one biti resene (na primer ako je unet pogresan 
+format datuma)
+
+13.04.2021.
+~~~~~~~~~~~
+
+Koja svojstva treba da imaju JSON objekti liability i liability_error ?
+
+
+24.04.2021.
+~~~~~~~~~~~
+
+Sta predstavlja "identifikator izmene unosa" /api/invoice/change_amount
+
+
+01.05.2021.
+~~~~~~~~~~~
+
+1. Dodati podrsku za bazu podataka (mongodb)
+2. Debagovati i testirati kod
+
+
+06.05.2021.
+~~~~~~~~~~~
+
+Potrebno je generisati recnik prilikom registracije fakture koji ce sadrzati sve potrebne podatke koje faktura treba
+da ima i taj recnik smestiti u bazu, prilikom poziva /api/invoice/<idf> treba iz baze vratiti takav recnik u zavisnosti
+od id same fakture
+
+
+07.05.2021.
+~~~~~~~~~~~
+
+Schema register:
+    "DebtorCompanyName": {"type": "string"},
+    "InvoiceNumber": {"type": "string"},
+    "Amount": {"type": "number"},
+    "IssueDate": {"type": "string", "format": "date"},
+    "Comments": {"type": "string"},
+    "Lifetime": {"type": "integer"}
+
+/api/invoice/<idf>
+{
+    "id":  2309,
+    "createdId":  2550,
+    "invoiceId":  "285F",
+    "creditorId":  1618,
+    "creditorName":  "Specijalna bolnica za ...",
+    "creditorCompanyNumber":  "17512579",
+    "creditorTaxIdNumber":  "103079070",
+    "debtorName":  "MF-UPRAVA ZA TREZOR",
+    "debtorCompanyNumber":  "10523",
+    "invoiceNumber":  "Racun 18/02",
+    "issueDate":  "2018-02-23T12:48:00",
+    "creationDate":  "2018-02-23T12:48:56.5633333",
+    "importDate":  "2018-02-26T12:48:56.5633333",
+    "dueDate":  "2018-04-27T12:48:56.5633333",
+    "amount":  1000.00,
+    "settledAmount":  0.00,
+    "status":  1,
+    "settled":  false,
+    ...
+}
+
+
