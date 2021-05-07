@@ -35,7 +35,7 @@ class InvoiceDetails(Resource):
         # todo: update this method
         status = dict()
         liability_invoice_details = dict()
-        find_result = invoices.find({"InvoiceId": idf})  # if not found we have KeyError
+        find_result = invoices.find({"InvoiceId": idf})
         status = {"status": find_result}
         return jsonify(status)
 
@@ -96,10 +96,13 @@ class Register(Resource):
                 schema_validation.schema_generator(curr_invoice, "schema_register")
             except exceptions.SchemaError as ex:
                 liability_error["SchemaError"] = ex.args[0]
+                liability_error["InvoiceNumber"].append(curr_invoice.get("InvoiceNumber"))
             else:
                 issue_date = curr_invoice["IssueDate"]
-                invoice_number = curr_invoice["InvoiceNumber"]
-                idf_list.append(register.generate_invoice_id(invoice_number))
+                liability["InvoiceNumber"].append(curr_invoice["InvoiceNumber"])
+                idf_list.append(register.generate_idf(curr_invoice["InvoiceNumber"]))
+                if len(posted_data.values()) > 1000:
+                    return jsonify({"Message": "Please enter 1000 invoices or less", "Code": HTTPStatus.BAD_REQUEST})
 
             if len(list(liability_error.values())) == 0:
                 liability_error = None
