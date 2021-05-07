@@ -32,9 +32,12 @@ format_issue_date = "%Y-%m-%d"
 
 class InvoiceDetails(Resource):
     def get(self, idf):
+        # todo: update this method
         status = dict()
         liability_invoice_details = dict()
-        invoices.find({"InvoiceId": idf}[0])
+        find_result = invoices.find({"InvoiceId": idf})  # if not found we have KeyError
+        status = {"status": find_result}
+        return jsonify(status)
 
 
 class Login(Resource):
@@ -94,10 +97,9 @@ class Register(Resource):
             except exceptions.SchemaError as ex:
                 liability_error["SchemaError"] = ex.args[0]
             else:
-
                 issue_date = curr_invoice["IssueDate"]
                 invoice_number = curr_invoice["InvoiceNumber"]
-                idf_list.append(invoice_number)
+                idf_list.append(register.generate_invoice_id(invoice_number))
 
             if len(list(liability_error.values())) == 0:
                 liability_error = None
@@ -161,6 +163,8 @@ class Cancel(Resource):
     def post(self):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_cancel")
+        invoice_id = server_data["InvoiceId"]
+        invoices.remove({"InvoiceId": invoice_id})
         return jsonify({"Message": message, "Code": code})
 
 
