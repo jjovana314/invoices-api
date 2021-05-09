@@ -12,4 +12,6 @@ def validate_date_time(format_datetime: str, date_time: str) -> datetime:
 
 
 def generate_idf(invoice_number):
-    return invoice_number.split(" ")[1].split("/")[0] + "F"
+    invoice_num_splited = invoice_number.split(" ")[1].split("/")
+    return invoice_num_splited[0] + invoice_num_splited[1] + "F"
+
