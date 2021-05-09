@@ -35,8 +35,8 @@ class InvoiceDetails(Resource):
         # todo: update this method
         status = dict()
         liability_invoice_details = dict()
-        find_result = invoices.find({"InvoiceId": idf})
-        status = {"status": find_result}
+        find_result = invoices.find({"invoiceId": idf}).count()
+        status = {"status": str(find_result)}
         return jsonify(status)
 
 
@@ -101,6 +101,7 @@ class Register(Resource):
                 issue_date = curr_invoice["IssueDate"]
                 liability["InvoiceNumber"].append(curr_invoice["InvoiceNumber"])
                 idf_list.append(register.generate_idf(curr_invoice["InvoiceNumber"]))
+                curr_invoice["invoiceId"] = register.generate_idf(curr_invoice["InvoiceNumber"])
                 if len(posted_data) > 1000:
                     return jsonify({"Message": "Please enter 1000 invoices or less", "Code": HTTPStatus.BAD_REQUEST})
 
@@ -167,8 +168,12 @@ class Cancel(Resource):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_cancel")
         invoice_id = server_data["InvoiceId"]
-        invoices.remove({"InvoiceId": invoice_id})
-        return jsonify({"Message": message, "Code": code})
+        if invoices.find({"invoiceId": invoice_id}).count() == 0:
+            return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
+        invoices.remove({"invoiceId": invoice_id})
+        if code != HTTPStatus.OK:
+            return jsonify({"Message": message, "Code": code})
+        return jsonify({"Message": "Invoice removed successfully", "Code": HTTPStatus.OK})
 
 
 api.add_resource(Login, "/api/login")
