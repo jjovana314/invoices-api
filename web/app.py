@@ -101,7 +101,7 @@ class Register(Resource):
                 issue_date = curr_invoice["IssueDate"]
                 liability["InvoiceNumber"].append(curr_invoice["InvoiceNumber"])
                 idf_list.append(register.generate_idf(curr_invoice["InvoiceNumber"]))
-                if len(posted_data.values()) > 1000:
+                if len(posted_data) > 1000:
                     return jsonify({"Message": "Please enter 1000 invoices or less", "Code": HTTPStatus.BAD_REQUEST})
 
             if len(list(liability_error.values())) == 0:
