@@ -35,9 +35,9 @@ class InvoiceDetails(Resource):
         # todo: update this method
         status = dict()
         liability_invoice_details = dict()
-        find_result = invoices.find({"invoiceId": idf}).count()
-        status = {"status": str(find_result)}
-        return jsonify(status)
+        find_result = invoices.find_one({"invoiceId": idf})
+        find_result["_id"] = str(find_result["_id"])
+        return jsonify(find_result)
 
 
 class Login(Resource):
