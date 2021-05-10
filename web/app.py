@@ -168,12 +168,30 @@ class Cancel(Resource):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_cancel")
         invoice_id = server_data["InvoiceId"]
-        if invoices.find({"invoiceId": invoice_id}).count() == 0:
+        if not invoice_exist(invoice_id):
             return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
         invoices.remove({"invoiceId": invoice_id})
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
         return jsonify({"Message": "Invoice removed successfully", "Code": HTTPStatus.OK})
+
+
+class ChangeAmount(Resource):
+    """ Change amount of invoice. """
+    def post(self):
+        server_data = request.get_json()
+        message, code = validate_schema_caller(server_data, "schema_change_amount")
+        if code != HTTPStatus.OK:
+            return jsonify({"Message": message, "Code": code})
+        invoice_id = server_data["invoiceId"]
+        if not invoice_exist(invoice_id):
+            return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
+        invoices.update({"invoiceId": invoice_id}, {"$set": {"Amount": server_data["amount"]}})
+        return jsonify({"Message": "Amount updated successfully", "Code": HTTPStatus.OK})
+
+
+def invoice_exist(invoice_id: str) -> bool:
+    return invoices.find({"invoiceId": invoice_id}).count() != 0
 
 
 api.add_resource(Login, "/api/login")
@@ -182,6 +200,7 @@ api.add_resource(Assign, "/api/invoice/assign")
 api.add_resource(CancelAssign, "/api/invoice/cancel-assign")
 api.add_resource(Cancel, "/api/invoice/cancel")
 api.add_resource(InvoiceDetails, "/api/invoice/<string:idf>", endpoint="invoice")
+api.add_resource(ChangeAmount, "/api/invoice/change-amount")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
