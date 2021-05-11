@@ -87,10 +87,12 @@ class Register(Resource):
 
         result_dict = dict()
         idf_list = []
-
+        # todo: test this method
+        # todo: check else statement below
         if len(posted_data) > max_invoices_request:
             liability_error["LimitError"] = f"Invoice limit per request is {max_invoices_request}"
-
+            result_dict["liabilityError"] = liability_error
+            return result_dict
         for curr_invoice in posted_data:
             try:
                 schema_validation.schema_generator(curr_invoice, "schema_register")
@@ -102,16 +104,14 @@ class Register(Resource):
                 liability["InvoiceNumber"].append(curr_invoice["InvoiceNumber"])
                 idf_list.append(register.generate_idf(curr_invoice["InvoiceNumber"]))
                 curr_invoice["invoiceId"] = register.generate_idf(curr_invoice["InvoiceNumber"])
-                if len(posted_data) > 1000:
-                    return jsonify({"Message": "Please enter 1000 invoices or less", "Code": HTTPStatus.BAD_REQUEST})
 
             if len(list(liability_error.values())) == 0:
                 liability_error = None
 
-            result_dict["liability"] = liability
-            result_dict["liabilityError"] = liability_error
-            result_dict["IDFList"] = idf_list
-            invoices.insert(curr_invoice)
+        result_dict["liability"] = liability
+        result_dict["liabilityError"] = liability_error
+        result_dict["IDFList"] = idf_list
+        invoices.insert(curr_invoice)
         return result_dict
 
 
@@ -135,7 +135,16 @@ def validate_date_caller(data: dict) -> None:
         liability["InvoiceNumber"].append(invoice_number)
 
 
-def validate_schema_caller(data_validation, schema_name):
+def validate_schema_caller(data_validation: dict, schema_name: str) -> tuple:
+    """ Call schema_generator function from schema_validation module.
+
+    Arguments:
+        data_validation {dict} -- data for validation
+        shcema_name {str} -- name of file where schema is located (withoud extension)
+
+    Returns:
+        tuple with message and code
+    """
     try:
         schema_validation.schema_generator(data_validation, schema_name)
     except exceptions.SchemaError:
@@ -191,6 +200,14 @@ class ChangeAmount(Resource):
 
 
 def invoice_exist(invoice_id: str) -> bool:
+    """ Check invoice existance in database.
+
+    Arguments:
+        invoice_id {str} -- invoice id
+
+    Returns:
+        True if invoice exist in database, False otherwise
+    """
     return invoices.find({"invoiceId": invoice_id}).count() != 0
 
 
