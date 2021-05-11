@@ -8,6 +8,7 @@ import exceptions
 import login
 import schema_validation
 import register
+import enum
 
 
 # todo: token should last only 20 minutes
@@ -30,6 +31,27 @@ invalid_login_counter = 0
 format_issue_date = "%Y-%m-%d"
 
 
+class InvoiceStatus(enum.Enum):
+    """ Invoice status enum. """
+    Active = (1, "Active registrated invoice")
+    Invalid = (2, "The invoice was rejected by debtor")
+    Canceled = (3, "The invoice was canceled by creditor")
+    PartiallySettled = (4, "The invoice was partially settled in partial amount")
+    Settled = (5, "The invoice has been settled")
+    Assigned = (6, "The debtor assigned the invoice to another debtor")
+    ProformaInvoice = (7, "Proforma invoice")
+
+    def __new__(cls, member_value, member_message):
+        member = object.__new__(cls)
+        member._value = member_value
+        member.message = member_message
+        return member
+
+    @property
+    def code(self):
+        return self._value
+
+
 class InvoiceDetails(Resource):
     def get(self, idf):
         # todo: update this method
@@ -37,6 +59,7 @@ class InvoiceDetails(Resource):
         liability_invoice_details = dict()
         find_result = invoices.find_one({"invoiceId": idf})
         find_result["_id"] = str(find_result["_id"])
+        # find_result = {"result": str(find_result)}
         return jsonify(find_result)
 
 
@@ -104,6 +127,8 @@ class Register(Resource):
                 liability["InvoiceNumber"].append(curr_invoice["InvoiceNumber"])
                 idf_list.append(register.generate_idf(curr_invoice["InvoiceNumber"]))
                 curr_invoice["invoiceId"] = register.generate_idf(curr_invoice["InvoiceNumber"])
+                curr_invoice["Status"] = InvoiceStatus.Active.code
+                invoices.insert(curr_invoice)
 
             if len(list(liability_error.values())) == 0:
                 liability_error = None
@@ -111,7 +136,7 @@ class Register(Resource):
         result_dict["liability"] = liability
         result_dict["liabilityError"] = liability_error
         result_dict["IDFList"] = idf_list
-        invoices.insert(curr_invoice)
+            
         return result_dict
 
 
