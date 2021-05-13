@@ -1,4 +1,3 @@
-# from flask_restful import Resource, Api
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api, reqparse
 from pymongo import MongoClient
@@ -79,7 +78,6 @@ class Login(Resource):
         access_token = create_access_token(identity=posted_data["login"], fresh=True)
         refresh_token = create_refresh_token(posted_data["login"])
         date_time = login.generate_date_time()
-        # rfsh_token = login.generate_refresh_token()
 
         return jsonify(
             {
@@ -137,7 +135,7 @@ class Register(Resource):
         result_dict["liabilityError"] = liability_error
         result_dict["IDFList"] = idf_list
             
-        return result_dict
+        return jsonify(result_dict)
 
 
 def validate_date_caller(data: dict) -> None:
@@ -236,6 +234,19 @@ def invoice_exist(invoice_id: str) -> bool:
     return invoices.find({"invoiceId": invoice_id}).count() != 0
 
 
+class PagedLiabilities(Resource):
+    def post(self):
+        server_data = request.get_json()
+        message, code = validate_schema_caller(server_data, "schema_paged_liabilities")
+        if code != HTTPStatus.OK:
+            return josnify({"Message": message, "Code": code})
+        query_result = invoices.find(server_data)
+        result = [invoice for invoice in query_result]
+        for invoice in result:
+            invoice["_id"] = str(invoice["_id"])
+        return result
+
+
 api.add_resource(Login, "/api/login")
 api.add_resource(Register, "/api/invoice/register")
 api.add_resource(Assign, "/api/invoice/assign")
@@ -243,6 +254,7 @@ api.add_resource(CancelAssign, "/api/invoice/cancel-assign")
 api.add_resource(Cancel, "/api/invoice/cancel")
 api.add_resource(InvoiceDetails, "/api/invoice/<string:idf>", endpoint="invoice")
 api.add_resource(ChangeAmount, "/api/invoice/change-amount")
+api.add_resource(PagedLiabilities, "/api/invoice/paged-liabilities")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
