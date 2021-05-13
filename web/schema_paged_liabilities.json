@@ -1,18 +1,18 @@
 {
     "type": "object",
     "properties": {
-        "debtorCompanyNumber": {"type": "string"},
-        "creditorName": {"type": "string"},
-        "debtorName": {"type": "string"},
-        "side": {"type": "string"},
-        "formattedInvoiceNumber": {"type": "string"},
-        "amount": {"type": "number"},
-        "settledAmount": {"type": "number"},
-        "status": {"type": "integer"},
-        "creationDate": {"type": "string"},
-        "dueDate": {"type": "string"},
-        "currentPageSize": {"type": "integer"},
-        "currentPage": {"type": "integer"}
+        "DebtorCompanyNumber": {"type": "string"},
+        "CreditorName": {"type": "string"},
+        "DebtorName": {"type": "string"},
+        "Side": {"type": "string"},
+        "FormattedInvoiceNumber": {"type": "string"},
+        "Amount": {"type": "number"},
+        "SettledAmount": {"type": "number"},
+        "Status": {"type": "integer"},
+        "CreationDate": {"type": "string"},
+        "DueDate": {"type": "string"},
+        "CurrentPageSize": {"type": "integer"},
+        "CurrentPage": {"type": "integer"}
     },
-    "required": ["side"]
+    "required": ["Side"]
 }
