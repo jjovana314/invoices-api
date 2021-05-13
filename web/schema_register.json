@@ -1,13 +1,13 @@
 {
     "type": "object",
     "properties": {
-        "DebtorCompanyName": {"type": "string"},
+        "DebtorCompanyNumber": {"type": "string"},
         "InvoiceNumber": {"type": "string"},
         "Amount": {"type": "number"},
         "IssueDate": {"type": "string", "format": "date"},
         "Comments": {"type": "string"},
         "Lifetime": {"type": "integer"}
     },
-    "required": ["DebtorCompanyName", "InvoiceNumber", "Amount", "IssueDate"],
+    "required": ["DebtorCompanyNumber", "InvoiceNumber", "Amount", "IssueDate"],
     "additionalProperties": false
 }
