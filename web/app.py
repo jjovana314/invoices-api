@@ -24,6 +24,7 @@ mongo_client = MongoClient("mongodb://db:27017")
 db = mongo_client.Database
 invoices = db["Invoices"]
 users = db["Users"]
+assigned = db["Assigned"]
 
 Unauthenticated = 401
 invalid_login_counter = 0
@@ -163,7 +164,7 @@ def validate_schema_caller(data_validation: dict, schema_name: str) -> tuple:
 
     Arguments:
         data_validation {dict} -- data for validation
-        shcema_name {str} -- name of file where schema is located (withoud extension)
+        shcema_name {str} -- name of file where schema is located (without extension)
 
     Returns:
         tuple with message and code
@@ -180,10 +181,14 @@ class Assign(Resource):
     """ Assign invoice. """
     def post(self):
         server_data = request.get_json()
-    
-        for invoice in server_data:
-            message, code = validate_schema_caller(invoice, "schema_assign")
-        return jsonify({"Message": message, "Code": code})
+        message, code = validate_schema_caller(server_data, "schema_assign")
+        if code != HTTPStatus.OK:
+            return jsonify({"Message": message, "Code": code})
+        curr_invoice_from_db = invoices.update_one(
+            {"invoiceId": server_data["InvoiceId"]},
+            {"$set": {"DebtorCompanyNumber": server_data["DebtorCompanyNumber"]}}
+        )
+        return jsonify({"Message": "Invoice assigned successfully", "Code": HTTPStatus.OK})
 
 
 class CancelAssign(Resource):
