@@ -3,7 +3,7 @@
     "properties": {
         "InvoiceId": {"type": "string"},
         "AssignmentContractNumber": {"type": "string"},
-        "DebtorCompanyName": {"type": "string"}
+        "DebtorCompanyNumber": {"type": "string"}
     },
-    "required": ["InvoiceId", "AssignmentContractNumber", "DebtorCompanyName"]
+    "required": ["InvoiceId", "AssignmentContractNumber", "DebtorCompanyNumber"]
 }
