@@ -242,7 +242,7 @@ class PagedLiabilities(Resource):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_paged_liabilities")
         if code != HTTPStatus.OK:
-            return josnify({"Message": message, "Code": code})
+            return jsonify({"Message": message, "Code": code})
         query_result = invoices.find(server_data)
         result = [invoice for invoice in query_result]
         for invoice in result:
