@@ -109,8 +109,6 @@ class Register(Resource):
 
         result_dict = dict()
         idf_list = []
-        # todo: test this method
-        # todo: check else statement below
         if len(posted_data) > max_invoices_request:
             liability_error["LimitError"] = f"Invoice limit per request is {max_invoices_request}"
             result_dict["liabilityError"] = liability_error
