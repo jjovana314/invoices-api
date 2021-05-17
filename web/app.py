@@ -243,6 +243,11 @@ class PagedLiabilities(Resource):
         message, code = validate_schema_caller(server_data, "schema_paged_liabilities")
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
+        side_param = server_data["Side"]
+        # todo: try to put this validation to jsonschema
+        if side_param != "debtor" and side_param != "creditor":
+            return jsonify({"Message": "Side parameter is not valid", "Code": HTTPStatus.BAD_REQUEST})
+        server_data.pop("Side")
         query_result = invoices.find(server_data)
         result = [invoice for invoice in query_result]
         for invoice in result:
