@@ -190,7 +190,7 @@ class Assign(Resource):
             f.write(invoices.find_one({"invoiceId": server_data["InvoiceId"]})["DebtorCompanyNumber"])
         curr_invoice_from_db = invoices.update_one(
             {"invoiceId": server_data["InvoiceId"]},
-            {"$set": {"DebtorCompanyNumber": server_data["DebtorCompanyNumber"], "Status": InvoiceStatus.Assigned,code}}
+            {"$set": {"DebtorCompanyNumber": server_data["DebtorCompanyNumber"], "Status": InvoiceStatus.Assigned.code}}
         )
         return jsonify({"Message": "Invoice assigned successfully", "Code": HTTPStatus.OK})
 
