@@ -127,6 +127,7 @@ class Register(Resource):
                 idf_list.append(register.generate_idf(curr_invoice["InvoiceNumber"]))
                 curr_invoice["invoiceId"] = register.generate_idf(curr_invoice["InvoiceNumber"])
                 curr_invoice["Status"] = InvoiceStatus.Active.code
+                curr_invoice["idChange"] = 0
                 invoices.insert(curr_invoice)
 
             if len(list(liability_error.values())) == 0:
@@ -240,8 +241,11 @@ class ChangeAmount(Resource):
         invoice_id = server_data["invoiceId"]
         if not invoice_exist(invoice_id):
             return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
-        invoices.update({"invoiceId": invoice_id}, {"$set": {"Amount": server_data["amount"]}})
-        return jsonify({"Message": "Amount updated successfully", "Code": HTTPStatus.OK})
+        with open("last_amount.txt", "w") as f:
+            f.write(str(invoices.find_one({"invoiceId": invoice_id})["Amount"]))
+        id_change = invoices.find_one({"invoiceId": invoice_id})["idChange"] + 1
+        invoices.update({"invoiceId": invoice_id}, {"$set": {"Amount": server_data["amount"], "idChange": id_change}})
+        return jsonify({"Message": "Amount updated successfully", "Code": HTTPStatus.OK, "id": id_change})
 
 
 def invoice_exist(invoice_id: str) -> bool:
@@ -277,6 +281,13 @@ class PagedLiabilities(Resource):
 class RevertAmount(Resource):
     def post(self):
         server_data = request.get_json()
+        message, code = validate_schema_caller(server_data, "schema_revert_amount")
+        if code != HTTPStatus.OK:
+            return jsonify({"Messge": message, "Code": code})
+        id_ = server_data["id"]
+        with open("last_amount.txt", "r") as f:
+            last_amount = f.read()
+        invoices.set({""})
 
 
 api.add_resource(Login, "/api/login")
