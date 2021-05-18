@@ -91,6 +91,8 @@ class Login(Resource):
 
 liability = dict()
 liability_error = dict()
+last_amount = 0
+last_dbt_num = ""
 
 
 class Register(Resource):
@@ -182,9 +184,13 @@ class Assign(Resource):
         message, code = validate_schema_caller(server_data, "schema_assign")
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
+        global last_dbt_num
+        # last_dbt_num = invoices.find_one({"invoiceId": server_data["InvoiceId"]})["DebtorCompanyNumber"]
+        with open("last_debtor_company_number.txt", "w") as f:
+            f.write(invoices.find_one({"invoiceId": server_data["InvoiceId"]})["DebtorCompanyNumber"])
         curr_invoice_from_db = invoices.update_one(
             {"invoiceId": server_data["InvoiceId"]},
-            {"$set": {"DebtorCompanyNumber": server_data["DebtorCompanyNumber"]}}
+            {"$set": {"DebtorCompanyNumber": server_data["DebtorCompanyNumber"], "Status": InvoiceStatus.Assigned,code}}
         )
         return jsonify({"Message": "Invoice assigned successfully", "Code": HTTPStatus.OK})
 
@@ -192,9 +198,18 @@ class Assign(Resource):
 class CancelAssign(Resource):
     """ Cancel assignation. """
     def post(self):
+        # test post method
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_cancel_assign")
-        return jsonify({"Message": message, "Code": code})
+        if code != HTTPStatus.OK:
+            return jsonify({"Message": message, "Code": code})
+        with open("last_debtor_company_number.txt", "r") as f:
+            debtor_number = f.read()
+        curr_invoice_from_db = invoices.update_one(
+            {"invoiceId": server_data["InvoiceId"]},
+            {"$set": {"DebtorCompanyNumber": debtor_number}}
+        )
+        return jsonify({"Message": "Assignation canceled successfully", "Code": HTTPStatus.OK})
 
 
 class Cancel(Resource):
@@ -205,7 +220,11 @@ class Cancel(Resource):
         invoice_id = server_data["InvoiceId"]
         if not invoice_exist(invoice_id):
             return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
-        invoices.remove({"invoiceId": invoice_id})
+        # invoices.remove({"invoiceId": invoice_id})
+        invoices.set(
+            {"invoiceId": invoice_id},
+            {"$set": {"Status": InvoiceStatus.Canceled.code}}
+        )
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
         return jsonify({"Message": "Invoice removed successfully", "Code": HTTPStatus.OK})
@@ -255,6 +274,11 @@ class PagedLiabilities(Resource):
         return result
 
 
+class RevertAmount(Resource):
+    def post(self):
+        server_data = request.get_json()
+
+
 api.add_resource(Login, "/api/login")
 api.add_resource(Register, "/api/invoice/register")
 api.add_resource(Assign, "/api/invoice/assign")
@@ -263,6 +287,7 @@ api.add_resource(Cancel, "/api/invoice/cancel")
 api.add_resource(InvoiceDetails, "/api/invoice/<string:idf>", endpoint="invoice")
 api.add_resource(ChangeAmount, "/api/invoice/change-amount")
 api.add_resource(PagedLiabilities, "/api/invoice/paged-liabilities")
+api.add_resource(RevertAmount, "/api/invoice/revert-amount")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
