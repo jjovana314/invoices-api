@@ -75,3 +75,8 @@ Schema register:
 }
 
 
+17.05.2021.
+~~~~~~~~~~~
+
+Proveriti sta je polje Side koje se dostavlja serveru i kako utice na filtiranje podataka iz baze
+
