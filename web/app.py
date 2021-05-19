@@ -71,7 +71,9 @@ class Login(Resource):
         global invalid_login_counter
         schema_validation(posted_data, "schema_login")
 
-        is_login_valid, invalid_login_counter = login.login_exception_handler(posted_data, invalid_login_counter)
+        is_login_valid, invalid_login_counter = login.login_exception_handler(
+            posted_data, invalid_login_counter
+        )
         if not is_login_valid and invalid_login_counter >= 3:
             # todo: if invalid_login_counter is greather than 3 we should forbid user to login next 1 minute
             return jsonify({"Message": "Wait one minute, then try again", "Code": Unauthenticated})
@@ -191,7 +193,12 @@ class Assign(Resource):
             f.write(invoices.find_one({"invoiceId": server_data["InvoiceId"]})["DebtorCompanyNumber"])
         curr_invoice_from_db = invoices.update_one(
             {"invoiceId": server_data["InvoiceId"]},
-            {"$set": {"DebtorCompanyNumber": server_data["DebtorCompanyNumber"], "Status": InvoiceStatus.Assigned.code}}
+            {
+                "$set": {
+                    "DebtorCompanyNumber": server_data["DebtorCompanyNumber"],
+                    "Status": InvoiceStatus.Assigned.code
+                }
+            }
         )
         return jsonify({"Message": "Invoice assigned successfully", "Code": HTTPStatus.OK})
 
@@ -244,8 +251,13 @@ class ChangeAmount(Resource):
         with open("last_amount.txt", "w") as f:
             f.write(str(invoices.find_one({"invoiceId": invoice_id})["Amount"]))
         id_change = invoices.find_one({"invoiceId": invoice_id})["idChange"] + 1
-        invoices.update({"invoiceId": invoice_id}, {"$set": {"Amount": server_data["amount"], "idChange": id_change}})
-        return jsonify({"Message": "Amount updated successfully", "Code": HTTPStatus.OK, "id": id_change})
+        invoices.update(
+            {"invoiceId": invoice_id},
+            {"$set": {"Amount": server_data["amount"], "idChange": id_change}}
+        )
+        return jsonify(
+            {"Message": "Amount updated successfully", "Code": HTTPStatus.OK, "id": id_change}
+        )
 
 
 def invoice_exist(invoice_id: str) -> bool:
@@ -287,7 +299,14 @@ class RevertAmount(Resource):
         id_ = server_data["id"]
         with open("last_amount.txt", "r") as f:
             last_amount = f.read()
-        invoices.set({""})
+        invoices.update({"idChange": id_}, {"$set": {"Amount": int(last_amount)}})
+        return jsonify(
+            {
+                "Message": "Amount reverted successfully", 
+                "Code": HTTPStatus.OK, 
+                "last_amount": last_amount
+            }
+        )
 
 
 api.add_resource(Login, "/api/login")
