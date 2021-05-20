@@ -42,9 +42,9 @@ class InvoiceStatus(enum.Enum):
     ProformaInvoice = (7, "Proforma invoice")
 
     def __new__(cls, member_value, member_message):
-        member = object.__new__(cls)
-        member._value = member_value
-        member._message = member_message
+        member = object.__new__(cls)    # create new member object (InvoiceStatus member)
+        member._value = member_value    # member value is code that we want to send
+        member._message = member_message    # member message is message of InvoiceStatus ("Proforma invoice")
         return member
 
     @property
@@ -57,18 +57,16 @@ class InvoiceStatus(enum.Enum):
 
 
 class InvoiceDetails(Resource):
+    """ Return invoice details for given invoice id. """
     def get(self, idf):
-        # todo: update this method
         status = dict()
-        liability_invoice_details = dict()
         if not invoice_exist("invoiceId", idf):
             status = {"message": "Unsuccess", "code": 1}
             return jsonify({"status": status})
-        find_result = invoices.find_one({"invoiceId": idf})
-        find_result["_id"] = str(find_result["_id"])
+        find_result = invoices.find_one({"invoiceId": idf})     # find invoice in database
+        find_result["_id"] = str(find_result["_id"])        # convert _id element from database to string
         status = {"message": "Success", "code": 0}
-        liability_invoice_details = find_result
-        result = {"status": status, "liability": liability_invoice_details}
+        result = {"status": status, "liability": find_result}
         return jsonify(result)
 
 
@@ -330,6 +328,7 @@ class RevertAmount(Resource):
 
 
 class Validate(Resource):
+    """ Validate settlment invoices. """
     def post(self):
         server_data = request.get_json()
         settlement = dict()
