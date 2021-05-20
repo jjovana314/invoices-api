@@ -15,7 +15,7 @@ import enum
 
 
 app = Flask(__name__)
-app.config["JWT_SECRET_KEY"] = "super-secret" # ! change this, only for testing
+app.config["JWT_SECRET_KEY"] = "super-secret"
 jwt = JWTManager(app)
 api = Api(app)
 
@@ -44,12 +44,16 @@ class InvoiceStatus(enum.Enum):
     def __new__(cls, member_value, member_message):
         member = object.__new__(cls)
         member._value = member_value
-        member.message = member_message
+        member._message = member_message
         return member
 
     @property
     def code(self):
         return self._value
+
+    @property
+    def message(self):
+        return self._message
 
 
 class InvoiceDetails(Resource):
@@ -57,10 +61,15 @@ class InvoiceDetails(Resource):
         # todo: update this method
         status = dict()
         liability_invoice_details = dict()
+        if not invoice_exist("invoiceId", idf):
+            status = {"message": "Unsuccess", "code": 1}
+            return jsonify({"status": status})
         find_result = invoices.find_one({"invoiceId": idf})
         find_result["_id"] = str(find_result["_id"])
-        # find_result = {"result": str(find_result)}
-        return jsonify(find_result)
+        status = {"message": "Success", "code": 0}
+        liability_invoice_details = find_result
+        result = {"status": status, "liability": liability_invoice_details}
+        return jsonify(result)
 
 
 class Login(Resource):
@@ -126,14 +135,17 @@ class Register(Resource):
             else:
                 issue_date = curr_invoice["IssueDate"]
                 liability["InvoiceNumber"].append(curr_invoice["InvoiceNumber"])
-                idf_list.append(register.generate_idf(curr_invoice["InvoiceNumber"]))
-                curr_invoice["invoiceId"] = register.generate_idf(curr_invoice["InvoiceNumber"])
+                idf = register.generate_idf(curr_invoice["InvoiceNumber"])
+                idf_list.append(idf)
+                if invoice_exist("invoiceId", idf):
+                    return jsonify({"Message": "Invoice already exist", "Code": HTTPStatus.BAD_REQUEST})
+                curr_invoice["invoiceId"] = idf
                 curr_invoice["Status"] = InvoiceStatus.Active.code
                 curr_invoice["idChange"] = 0
                 invoices.insert(curr_invoice)
 
-            if len(list(liability_error.values())) == 0:
-                liability_error = None
+        if len(list(liability_error.values())) == 0:
+            liability_error = None
 
         result_dict["liability"] = liability
         result_dict["liabilityError"] = liability_error
@@ -187,8 +199,9 @@ class Assign(Resource):
         message, code = validate_schema_caller(server_data, "schema_assign")
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
+        if not invoice_exist("invoiceId", server_data["InvoiceId"]):
+            return jsonify({"Message": "Invoice does not exist", "Code": HTTPStatus.BAD_REQUEST})
         global last_dbt_num
-        # last_dbt_num = invoices.find_one({"invoiceId": server_data["InvoiceId"]})["DebtorCompanyNumber"]
         with open("last_debtor_company_number.txt", "w") as f:
             f.write(invoices.find_one({"invoiceId": server_data["InvoiceId"]})["DebtorCompanyNumber"])
         curr_invoice_from_db = invoices.update_one(
@@ -211,6 +224,9 @@ class CancelAssign(Resource):
         message, code = validate_schema_caller(server_data, "schema_cancel_assign")
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
+        invoice_id = server_data["InvoiceId"]
+        if not invoice_exist("invoiceId", invoice_id):
+            return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
         with open("last_debtor_company_number.txt", "r") as f:
             debtor_number = f.read()
         curr_invoice_from_db = invoices.update_one(
@@ -225,16 +241,15 @@ class Cancel(Resource):
     def post(self):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_cancel")
+        if code != HTTPStatus.OK:
+            return jsonify({"Message": message, "Code": code})
         invoice_id = server_data["InvoiceId"]
-        if not invoice_exist(invoice_id):
+        if not invoice_exist("invoiceId", invoice_id):
             return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
-        # invoices.remove({"invoiceId": invoice_id})
-        invoices.set(
+        invoices.update_one(
             {"invoiceId": invoice_id},
             {"$set": {"Status": InvoiceStatus.Canceled.code}}
         )
-        if code != HTTPStatus.OK:
-            return jsonify({"Message": message, "Code": code})
         return jsonify({"Message": "Invoice removed successfully", "Code": HTTPStatus.OK})
 
 
@@ -246,12 +261,12 @@ class ChangeAmount(Resource):
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
         invoice_id = server_data["invoiceId"]
-        if not invoice_exist(invoice_id):
+        if not invoice_exist("invoiceId", invoice_id):
             return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
         with open("last_amount.txt", "w") as f:
             f.write(str(invoices.find_one({"invoiceId": invoice_id})["Amount"]))
         id_change = invoices.find_one({"invoiceId": invoice_id})["idChange"] + 1
-        invoices.update(
+        invoices.update_one(
             {"invoiceId": invoice_id},
             {"$set": {"Amount": server_data["amount"], "idChange": id_change}}
         )
@@ -260,7 +275,7 @@ class ChangeAmount(Resource):
         )
 
 
-def invoice_exist(invoice_id: str) -> bool:
+def invoice_exist(name_in_database: str, value: str) -> bool:
     """ Check invoice existance in database.
 
     Arguments:
@@ -269,7 +284,7 @@ def invoice_exist(invoice_id: str) -> bool:
     Returns:
         True if invoice exist in database, False otherwise
     """
-    return invoices.find({"invoiceId": invoice_id}).count() != 0
+    return invoices.find({name_in_database: value}).count() != 0
 
 
 class PagedLiabilities(Resource):
@@ -278,6 +293,8 @@ class PagedLiabilities(Resource):
         message, code = validate_schema_caller(server_data, "schema_paged_liabilities")
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
+        if not invoice_exist("DebtorCompanyNumber", server_data["DebtorCompanyNumber"]):
+            return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
         side_param = server_data["Side"]
         # todo: try to put this validation to jsonschema
         if side_param != "debtor" and side_param != "creditor":
@@ -296,10 +313,13 @@ class RevertAmount(Resource):
         message, code = validate_schema_caller(server_data, "schema_revert_amount")
         if code != HTTPStatus.OK:
             return jsonify({"Messge": message, "Code": code})
-        id_ = server_data["id"]
+        try:
+            id_ = server_data["id"]
+        except KeyError:
+            return jsonify({"Message": "id is invalic", "Code": HTTPStatus.BAD_REQUEST})
         with open("last_amount.txt", "r") as f:
             last_amount = f.read()
-        invoices.update({"idChange": id_}, {"$set": {"Amount": int(last_amount)}})
+        invoices.update_one({"idChange": id_}, {"$set": {"Amount": int(last_amount)}})
         return jsonify(
             {
                 "Message": "Amount reverted successfully", 
@@ -307,6 +327,51 @@ class RevertAmount(Resource):
                 "last_amount": last_amount
             }
         )
+
+
+class Validate(Resource):
+    def post(self):
+        server_data = request.get_json()
+        settlement = dict()
+        settlement_error = dict()
+        bank_num = 840
+        result = []
+        for settled_invoice in server_data:
+            message, code = validate_schema_caller(settled_invoice, "schema_validate")
+            if code != HTTPStatus.OK:
+                settlement_error = {"Message": message, "Code": code}
+                return jsonify({"settlement": settlement, "settlementError": settlement_error})
+            if int(settled_invoice["bank"]) != bank_num:
+                settlement_error = {
+                    "Message": f"Bank number can be only {bank_num}",
+                    "Code": HTTPStatus.BAD_REQUEST
+                }
+                return jsonify({"settlement": settlement, "settlementError": settlement_error})
+            idf = register.generate_idf(settled_invoice["invoiceNumber"])
+            if not invoice_exist("invoiceId", idf):
+                settlement_error = {"Message": "Invoice does not exist", "Code": HTTPStatus.BAD_REQUEST}
+                return jsonify({"settlement": settlement, "settlementError": settlement_error})
+            settled_amount = settled_invoice["settledAmount"]
+            curr_idf = register.generate_idf(settled_invoice["invoiceNumber"])
+            amount = invoices.find_one({"invoiceId": curr_idf})["Amount"]
+            if settled_amount > amount:
+                settlement_error = {
+                    "Message": "setteled amount cannot be greather than invoice amount",
+                    "Code": HTTPStatus.BAD_REQUEST
+                }
+                return jsonify({"settlement": settlement, "settlementError": settlement_error})
+            status_curr_idf = invoices.find_one({"invoiceId": curr_idf})["Status"]
+            if (status_curr_idf == InvoiceStatus.Canceled.code or
+                status_curr_idf == InvoiceStatus.Settled.code or
+                status_curr_idf == InvoiceStatus.Invalid.code):
+                settlement_error = {
+                    "Message": "Invoice is invalid or canceled or settled",
+                    "Code": HTTPStatus.BAD_REQUEST
+                }
+                return jsonify({"settlement": settlement, "settlementError": settlement_error})
+            settlement = {"invoiceId": curr_idf}
+            result.append({"settlement": settlement, "settlementError": settlement_error})
+        return jsonify(result)
 
 
 api.add_resource(Login, "/api/login")
@@ -318,6 +383,7 @@ api.add_resource(InvoiceDetails, "/api/invoice/<string:idf>", endpoint="invoice"
 api.add_resource(ChangeAmount, "/api/invoice/change-amount")
 api.add_resource(PagedLiabilities, "/api/invoice/paged-liabilities")
 api.add_resource(RevertAmount, "/api/invoice/revert-amount")
+api.add_resource(Validate, "/api/invoice/validate")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")
