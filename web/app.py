@@ -149,7 +149,7 @@ class Register(Resource):
                 curr_invoice["invoiceId"] = idf
                 curr_invoice["Status"] = InvoiceStatus.Active.code
                 curr_invoice["idChange"] = 0
-                invoices.insert(curr_invoice)   # insert invoice in database
+                invoices.insert_one(curr_invoice)   # insert invoice in database
 
         if len(list(liability_error.values())) == 0:
             liability_error = None
@@ -210,6 +210,7 @@ class Assign(Resource):
             return jsonify({"Message": "Invoice does not exist", "Code": HTTPStatus.BAD_REQUEST})
         global last_dbt_num
         with open("last_debtor_company_number.txt", "w") as f:
+            # write in file old debtor number
             f.write(invoices.find_one({"invoiceId": server_data["InvoiceId"]})["DebtorCompanyNumber"])
         curr_invoice_from_db = invoices.update_one(
             {"invoiceId": server_data["InvoiceId"]},
@@ -291,7 +292,7 @@ def invoice_exist(name_in_database: str, value: str) -> bool:
     Returns:
         True if invoice exist in database, False otherwise
     """
-    return invoices.find({name_in_database: value}).count() != 0
+    return invoices.count_documents({name_in_database: value}) != 0
 
 
 class PagedLiabilities(Resource):
