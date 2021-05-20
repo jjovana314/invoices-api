@@ -76,12 +76,20 @@ class Login(Resource):
         posted_data = request.get_json()
 
         global invalid_login_counter
-        schema_validation(posted_data, "schema_login")
+        message, code = validate_schema_caller(posted_data, "schema_login")
+        if code != HTTPStatus.OK:
+            return jsonify({"Message": message, "Code": code})
 
         is_login_valid, invalid_login_counter = login.login_exception_handler(
             posted_data, invalid_login_counter
         )
-        if not is_login_valid and invalid_login_counter >= 3:
+        if not is_login_valid:
+            with open("invalid_login_counter.txt", "r") as f:
+                invalid_login_counter = f.read()
+            invalid_login_counter += 1
+            with open("invalid_login_counter.txt", "w") as f:
+                f.write(str(invalid_login_counter))
+        if invalid_login_counter >= 3:
             # todo: if invalid_login_counter is greather than 3 we should forbid user to login next 1 minute
             return jsonify({"Message": "Wait one minute, then try again", "Code": Unauthenticated})
 
