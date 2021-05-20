@@ -127,18 +127,19 @@ class Register(Resource):
         liability_error["SchemaError"] = None
 
         result_dict = dict()
-        idf_list = []
+        idf_list = []       # list with invoces id
         if len(posted_data) > max_invoices_request:
             liability_error["LimitError"] = f"Invoice limit per request is {max_invoices_request}"
             result_dict["liabilityError"] = liability_error
             return result_dict
-        for curr_invoice in posted_data:
-            try:
-                schema_validation.schema_generator(curr_invoice, "schema_register")
-            except exceptions.SchemaError as ex:
-                liability_error["SchemaError"] = ex.args[0]
+        for curr_invoice in posted_data:    # posted_data is a list
+            message, code = validate_schema_caller(curr_invoice, "schema_register")
+            if code != HTTPStatus.OK:
+                # update liability_error dictionary
+                liability_error["SchemaError"] = message
                 liability_error["InvoiceNumber"].append(curr_invoice.get("InvoiceNumber"))
             else:
+                # if data is valid
                 issue_date = curr_invoice["IssueDate"]
                 liability["InvoiceNumber"].append(curr_invoice["InvoiceNumber"])
                 idf = register.generate_idf(curr_invoice["InvoiceNumber"])
@@ -148,7 +149,7 @@ class Register(Resource):
                 curr_invoice["invoiceId"] = idf
                 curr_invoice["Status"] = InvoiceStatus.Active.code
                 curr_invoice["idChange"] = 0
-                invoices.insert(curr_invoice)
+                invoices.insert(curr_invoice)   # insert invoice in database
 
         if len(list(liability_error.values())) == 0:
             liability_error = None
@@ -156,7 +157,7 @@ class Register(Resource):
         result_dict["liability"] = liability
         result_dict["liabilityError"] = liability_error
         result_dict["IDFList"] = idf_list
-            
+
         return jsonify(result_dict)
 
 
