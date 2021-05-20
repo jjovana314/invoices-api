@@ -78,6 +78,7 @@ class Login(Resource):
         global invalid_login_counter
         message, code = validate_schema_caller(posted_data, "schema_login")
         if code != HTTPStatus.OK:
+            # schema is not valid
             return jsonify({"Message": message, "Code": code})
 
         is_login_valid, invalid_login_counter = login.login_exception_handler(
@@ -117,7 +118,6 @@ class Register(Resource):
     def post(self):
         global format_issue_date
         posted_data = request.get_json()    # this is list with dictionaries
-        id_invoices = []
         max_invoices_request = 1000
         global liability
         global liability_error
