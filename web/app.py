@@ -10,10 +10,6 @@ import register
 import enum
 
 
-# todo: token should last only 20 minutes
-# todo: test and refactor code
-
-
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = "super-secret"
 jwt = JWTManager(app)
@@ -141,7 +137,6 @@ class Login(Resource):
             with open("invalid_login_counter.txt", "w") as f:
                 f.write(str(invalid_login_counter))
         if invalid_login_counter >= 3:
-            # todo: if invalid_login_counter is greather than 3 we should forbid user to login next 1 minute
             return jsonify({"Message": "Wait one minute, then try again", "Code": Unauthenticated})
 
         access_token = create_access_token(identity=posted_data["login"], fresh=True)
