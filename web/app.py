@@ -234,7 +234,6 @@ class Assign(Resource):
 class CancelAssign(Resource):
     """ Cancel assignation. """
     def post(self):
-        # test post method
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_cancel_assign")
         if code != HTTPStatus.OK:
@@ -243,8 +242,9 @@ class CancelAssign(Resource):
         if not invoice_exist("invoiceId", invoice_id):
             return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
         with open("last_debtor_company_number.txt", "r") as f:
+            # read last debtor number from file
             debtor_number = f.read()
-        curr_invoice_from_db = invoices.update_one(
+        invoices.update_one(
             {"invoiceId": server_data["InvoiceId"]},
             {"$set": {"DebtorCompanyNumber": debtor_number}}
         )
@@ -279,6 +279,7 @@ class ChangeAmount(Resource):
         if not invoice_exist("invoiceId", invoice_id):
             return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
         with open("last_amount.txt", "w") as f:
+            # save last amount from database in file
             f.write(str(invoices.find_one({"invoiceId": invoice_id})["Amount"]))
         id_change = invoices.find_one({"invoiceId": invoice_id})["idChange"] + 1
         invoices.update_one(
@@ -299,7 +300,6 @@ class PagedLiabilities(Resource):
         if not invoice_exist("DebtorCompanyNumber", server_data["DebtorCompanyNumber"]):
             return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
         side_param = server_data["Side"]
-        # todo: try to put this validation to jsonschema
         if side_param != "debtor" and side_param != "creditor":
             return jsonify({"Message": "Side parameter is not valid", "Code": HTTPStatus.BAD_REQUEST})
         server_data.pop("Side")
@@ -319,7 +319,7 @@ class RevertAmount(Resource):
         try:
             id_ = server_data["id"]
         except KeyError:
-            return jsonify({"Message": "id is invalic", "Code": HTTPStatus.BAD_REQUEST})
+            return jsonify({"Message": "id is invalid", "Code": HTTPStatus.BAD_REQUEST})
         with open("last_amount.txt", "r") as f:
             last_amount = f.read()
         invoices.update_one({"idChange": id_}, {"$set": {"Amount": int(last_amount)}})
