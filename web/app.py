@@ -56,6 +56,56 @@ class InvoiceStatus(enum.Enum):
         return self._message
 
 
+def validate_date_caller(data: dict) -> None:
+    """ Date validation and liability dictionaries update.
+
+    Arguments:
+        data {dict} -- server data
+    """
+    global liability
+    global liability_error
+    global format_issue_date
+    issue_date = data["IssueDate"]
+    invoice_number = data["InvoiceNumber"]
+
+    try:
+        date_formated = register.validate_date_time(format_issue_date, issue_date)
+    except ValueError:
+        liability_error["InvoiceNumber"].append(invoice_number)
+    else:
+        liability["InvoiceNumber"].append(invoice_number)
+
+
+def validate_schema_caller(data_validation: dict, schema_name: str) -> tuple:
+    """ Call schema_generator function from schema_validation module.
+
+    Arguments:
+        data_validation {dict} -- data for validation
+        shcema_name {str} -- name of file where schema is located (without extension)
+
+    Returns:
+        tuple with message and code
+    """
+    try:
+        schema_validation.schema_generator(data_validation, schema_name)
+    except exceptions.SchemaError:
+        return "Schema is not valid", HTTPStatus.BAD_REQUEST
+    else:
+        return "Data is valid", HTTPStatus.OK
+
+
+def invoice_exist(name_in_database: str, value: str) -> bool:
+    """ Check invoice existance in database.
+
+    Arguments:
+        invoice_id {str} -- invoice id
+
+    Returns:
+        True if invoice exist in database, False otherwise
+    """
+    return invoices.count_documents({name_in_database: value}) != 0
+
+
 class InvoiceDetails(Resource):
     """ Return invoice details for given invoice id. """
     def get(self, idf):
@@ -161,44 +211,6 @@ class Register(Resource):
         return jsonify(result_dict)
 
 
-def validate_date_caller(data: dict) -> None:
-    """ Date validation and liability dictionaries update.
-
-    Arguments:
-        data {dict} -- server data
-    """
-    global liability
-    global liability_error
-    global format_issue_date
-    issue_date = data["IssueDate"]
-    invoice_number = data["InvoiceNumber"]
-
-    try:
-        date_formated = register.validate_date_time(format_issue_date, issue_date)
-    except ValueError:
-        liability_error["InvoiceNumber"].append(invoice_number)
-    else:
-        liability["InvoiceNumber"].append(invoice_number)
-
-
-def validate_schema_caller(data_validation: dict, schema_name: str) -> tuple:
-    """ Call schema_generator function from schema_validation module.
-
-    Arguments:
-        data_validation {dict} -- data for validation
-        shcema_name {str} -- name of file where schema is located (without extension)
-
-    Returns:
-        tuple with message and code
-    """
-    try:
-        schema_validation.schema_generator(data_validation, schema_name)
-    except exceptions.SchemaError:
-        return "Schema is not valid", HTTPStatus.BAD_REQUEST
-    else:
-        return "Data is valid", HTTPStatus.OK
-
-
 class Assign(Resource):
     """ Assign invoice. """
     def post(self):
@@ -281,18 +293,6 @@ class ChangeAmount(Resource):
         return jsonify(
             {"Message": "Amount updated successfully", "Code": HTTPStatus.OK, "id": id_change}
         )
-
-
-def invoice_exist(name_in_database: str, value: str) -> bool:
-    """ Check invoice existance in database.
-
-    Arguments:
-        invoice_id {str} -- invoice id
-
-    Returns:
-        True if invoice exist in database, False otherwise
-    """
-    return invoices.count_documents({name_in_database: value}) != 0
 
 
 class PagedLiabilities(Resource):
