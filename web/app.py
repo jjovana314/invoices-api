@@ -265,7 +265,7 @@ class Cancel(Resource):
             {"invoiceId": invoice_id},
             {"$set": {"Status": InvoiceStatus.Canceled.code}}
         )
-        return jsonify({"Message": "Invoice removed successfully", "Code": HTTPStatus.OK})
+        return jsonify({"Message": "Invoice canceled successfully", "Code": HTTPStatus.OK})
 
 
 class ChangeAmount(Resource):
