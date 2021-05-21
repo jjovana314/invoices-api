@@ -340,16 +340,16 @@ class Validate(Resource):
         server_data = request.get_json()
         settlement = dict()
         settlement_error = dict()
-        bank_num = 840
+        _bank_num = 840      # this value is constant
         result = []
         for settled_invoice in server_data:
             message, code = validate_schema_caller(settled_invoice, "schema_validate")
             if code != HTTPStatus.OK:
                 settlement_error = {"Message": message, "Code": code}
                 return jsonify({"settlement": settlement, "settlementError": settlement_error})
-            if int(settled_invoice["bank"]) != bank_num:
+            if int(settled_invoice["bank"]) != _bank_num:
                 settlement_error = {
-                    "Message": f"Bank number can be only {bank_num}",
+                    "Message": f"Bank number can be only {_bank_num}",
                     "Code": HTTPStatus.BAD_REQUEST
                 }
                 return jsonify({"settlement": settlement, "settlementError": settlement_error})
