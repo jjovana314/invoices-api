@@ -292,6 +292,7 @@ class ChangeAmount(Resource):
 
 
 class PagedLiabilities(Resource):
+    """ Show invoice data from database. """
     def post(self):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_paged_liabilities")
@@ -302,7 +303,7 @@ class PagedLiabilities(Resource):
         side_param = server_data["Side"]
         if side_param != "debtor" and side_param != "creditor":
             return jsonify({"Message": "Side parameter is not valid", "Code": HTTPStatus.BAD_REQUEST})
-        server_data.pop("Side")
+        server_data.pop("Side")     # remove Side value from data dictionary
         query_result = invoices.find(server_data)
         result = [invoice for invoice in query_result]
         for invoice in result:
@@ -311,6 +312,7 @@ class PagedLiabilities(Resource):
 
 
 class RevertAmount(Resource):
+    """ Revert amounts of invoice. """
     def post(self):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_revert_amount")
