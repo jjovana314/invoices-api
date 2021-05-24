@@ -4,7 +4,7 @@
         "DebtorCompanyNumber": {"type": "string"},
         "InvoiceNumber": {"type": "string"},
         "Amount": {"type": "number"},
-        "IssueDate": {"type": "string", "format": "date"},
+        "IssueDate": {"type": "string"},
         "Comments": {"type": "string"},
         "Lifetime": {"type": "integer"}
     },
