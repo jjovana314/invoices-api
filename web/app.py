@@ -130,9 +130,11 @@ class Login(Resource):
         is_login_valid, invalid_login_counter = login.login_exception_handler(
             posted_data, invalid_login_counter
         )
+        with open("invalid_login_counter.txt", "w") as f:
+            f.write(str(invalid_login_counter))
         if not is_login_valid:
             with open("invalid_login_counter.txt", "r") as f:
-                invalid_login_counter = f.read()
+                invalid_login_counter = int(f.read())
             invalid_login_counter += 1
             with open("invalid_login_counter.txt", "w") as f:
                 f.write(str(invalid_login_counter))
