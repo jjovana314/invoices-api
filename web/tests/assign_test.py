@@ -26,7 +26,7 @@ def test_assign_invoice_not_exist():
     dbt_number = "10524"
     data = {'InvoiceId': invoice_id, 'AssignmentContractNumber': contract_num, 'DebtorCompanyNumber': dbt_number}
     r = requests.post(url, json=data, headers=headers)
-    response = {"Message": "Invoice does not exist", "Code": HTTPStatus.BAD_REQUEST}
+    response = {"Message": f"Invoice with id {invoice_id} does not exist", "Code": HTTPStatus.BAD_REQUEST}
     assert r.status_code == HTTPStatus.OK
     assert r.json() == response
 
@@ -62,6 +62,9 @@ def test_assign_not_valid_multiple_invoice():
             "DebtorCompanyNumber": dbt_number
         }
         r = requests.post(url, json=data, headers=headers)
-        response = {"Code": HTTPStatus.BAD_REQUEST, "Message": "Invoice does not exist"}
+        response = {
+            "Code": HTTPStatus.BAD_REQUEST,
+            "Message": f"Invoice with id {invoice_id_list[idx_invoice]} does not exist"
+        }
         assert r.status_code == HTTPStatus.OK
         assert r.json() == response
