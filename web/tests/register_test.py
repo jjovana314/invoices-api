@@ -3,8 +3,7 @@ import requests
 from http import HTTPStatus
 
 
-url = "http://127.0.0.1:5000"
-path = f"{url}/api/invoice/register"
+url = "http://127.0.0.1:5000/api/invoice/register"
 
 
 @pytest.mark.skip       # we have already tested this, it will fail because invoice already exists in database
@@ -31,7 +30,7 @@ def test_invoice_register_ok():
             "SchemaError": None
         }
     }
-    r = requests.post(path, json=data, headers=headers)
+    r = requests.post(url, json=data, headers=headers)
     assert r.status_code == HTTPStatus.OK
     assert r.json() == response
 
@@ -75,7 +74,7 @@ def test_invoice_register_multiple():
             "Lifetime": 20
         }
     ]
-    r = requests.post(path, json=data, headers=headers)
+    r = requests.post(url, json=data, headers=headers)
     response = {
         "IDFList": [invoice_ids[idx] for idx in range(len(invoice_ids)-1)],
         "liability": {"InvoiceNumber": [invoice_numbers[idx] for idx in range(len(invoice_numbers)-1)]},
@@ -114,7 +113,7 @@ def test_datetime_fail():
             "SchemaError": None
         }
     }
-    r = requests.post(path, json=data, headers=headers)
+    r = requests.post(url, json=data, headers=headers)
     assert r.status_code == HTTPStatus.OK
     assert r.json() == response
 
@@ -143,6 +142,6 @@ def test_amount_not_ok():
             "SchemaError": "Schema is not valid"
         }
     }
-    r = requests.post(path, json=data, headers=headers)
+    r = requests.post(url, json=data, headers=headers)
     assert r.status_code == HTTPStatus.OK
     assert r.json() == response
