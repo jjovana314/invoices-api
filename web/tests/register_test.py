@@ -4,13 +4,13 @@ from http import HTTPStatus
 
 
 url = "http://127.0.0.1:5000/api/invoice/register"
+headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 
 
 @pytest.mark.skip       # we have already tested this, it will fail because invoice already exists in database
 def test_invoice_register_ok():
     invoice_id = "1923F"
     invoice_number = "Racun 19/23"
-    headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
     data = [
         {
             "DebtorCompanyNumber": "10522",
@@ -37,7 +37,6 @@ def test_invoice_register_ok():
 
 @pytest.mark.skip   # we have already tested this, it will fail because invoice already exists in database
 def test_invoice_register_multiple():
-    headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
     # invoice_ids = ["1851F", "1852F", "1853F", "1854F"]
     first_invoice = 11
     last_invoice = 16
@@ -93,7 +92,6 @@ def test_datetime_fail():
     invoice_id = "1931F"
     invoice_number = "Racun 19/31"
     date_invoice_invalid = "22.03.2020"
-    headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
     data = [
         {
             "DebtorCompanyNumber": "10522",
@@ -123,7 +121,6 @@ def test_amount_not_ok():
     amount_invalid = "0"
     invoice_number = "Racun 19/32"
     invoice_id = "1932F"
-    headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
     data = [
         {
             "DebtorCompanyNumber": "10522",
