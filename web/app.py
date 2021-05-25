@@ -193,7 +193,7 @@ class Register(Resource):
                 idf = register.generate_idf(curr_invoice["InvoiceNumber"])
                 idf_list.append(idf)
                 if invoice_exist("invoiceId", idf):
-                    return jsonify({"Message": "Invoice already exist", "Code": HTTPStatus.BAD_REQUEST})
+                    return jsonify({"Message": f"Invoice with id {idf} already exist", "Code": HTTPStatus.BAD_REQUEST})
                 curr_invoice["invoiceId"] = idf
                 curr_invoice["Status"] = InvoiceStatus.Active.code
                 curr_invoice["idChange"] = 0
@@ -216,8 +216,14 @@ class Assign(Resource):
         message, code = validate_schema_caller(server_data, "schema_assign")
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
-        if not invoice_exist("invoiceId", server_data["InvoiceId"]):
-            return jsonify({"Message": "Invoice does not exist", "Code": HTTPStatus.BAD_REQUEST})
+        invoice_id = server_data["InvoiceId"]
+        if not invoice_exist("invoiceId", invoice_id):
+            return jsonify(
+                {
+                    "Message": f"Invoice with id {invoice_id} does not exist",
+                    "Code": HTTPStatus.BAD_REQUEST
+                }
+            )
         global last_dbt_num
         with open("last_debtor_company_number.txt", "w") as f:
             # write in file old debtor number
@@ -243,7 +249,7 @@ class CancelAssign(Resource):
             return jsonify({"Message": message, "Code": code})
         invoice_id = server_data["InvoiceId"]
         if not invoice_exist("invoiceId", invoice_id):
-            return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
+            return jsonify({"Message": f"Invoice with id {invoice_id} does not exist.", "Code": HTTPStatus.BAD_REQUEST})
         with open("last_debtor_company_number.txt", "r") as f:
             # read last debtor number from file
             debtor_number = f.read()
@@ -358,7 +364,7 @@ class Validate(Resource):
                 return jsonify({"settlement": settlement, "settlementError": settlement_error})
             idf = register.generate_idf(settled_invoice["invoiceNumber"])
             if not invoice_exist("invoiceId", idf):
-                settlement_error = {"Message": "Invoice does not exist", "Code": HTTPStatus.BAD_REQUEST}
+                settlement_error = {"Message": f"Invoice with id {idf} does not exist", "Code": HTTPStatus.BAD_REQUEST}
                 return jsonify({"settlement": settlement, "settlementError": settlement_error})
             settled_amount = settled_invoice["settledAmount"]
             curr_idf = register.generate_idf(settled_invoice["invoiceNumber"])
