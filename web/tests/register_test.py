@@ -39,10 +39,10 @@ def test_invoice_register_ok():
 def test_invoice_register_multiple():
     headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
     # invoice_ids = ["1851F", "1852F", "1853F", "1854F"]
-    first_invoice = 16
-    last_invoice = 21
-    invoice_ids = [f"19{num}F" for num in range(first_invoice, last_invoice)]
-    invoice_numbers = [f"Racun 19/{num}" for num in range(first_invoice, last_invoice)]
+    first_invoice = 11
+    last_invoice = 16
+    invoice_ids = [f"20{num}F" for num in range(first_invoice, last_invoice)]
+    invoice_numbers = [f"Racun 20/{num}" for num in range(first_invoice, last_invoice)]
     data = [
         {
             "DebtorCompanyNumber": "10522",
