@@ -34,7 +34,7 @@ def test_fail_schema_name_login():
 def test_fail_schema_password_login():
     data = """
     {
-        "username": "name:
+        "username": "name"
     }
     """
     msg = {"Code": HTTPStatus.BAD_REQUEST, "Message": "Schema is not valid"}
