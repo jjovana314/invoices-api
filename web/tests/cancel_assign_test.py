@@ -33,10 +33,11 @@ def test_cancel_assign_multiple_ok():
 		r = requests.post(url, json=data, headers=headers)
 		assert r.json() == response
 
+
 def test_cancel_assign_invalid_multiple():
 	idf_num_start = 16
 	idf_num_end = 19
-	invoice_id_list = [f"19{idf_num}XXX" for idf_num in range(idf_num_start, idf_num_end)]
+	invoice_id_list = [f"19{idf_num}XXXQ@" for idf_num in range(idf_num_start, idf_num_end)]
 	for invoice_id in invoice_id_list:
 		data = {"InvoiceId": invoice_id}
 		r = requests.post(url, json=data, headers=headers)
