@@ -269,7 +269,12 @@ class Cancel(Resource):
             return jsonify({"Message": message, "Code": code})
         invoice_id = server_data["InvoiceId"]
         if not invoice_exist("invoiceId", invoice_id):
-            return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
+            return jsonify(
+                {
+                    "Message": f"Invoice with id {invoice_id} does not exist.",
+                    "Code": HTTPStatus.BAD_REQUEST
+                }
+            )
         invoices.update_one(
             {"invoiceId": invoice_id},
             {"$set": {"Status": InvoiceStatus.Canceled.code}}
