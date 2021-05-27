@@ -224,7 +224,6 @@ class Assign(Resource):
                     "Code": HTTPStatus.BAD_REQUEST
                 }
             )
-        global last_dbt_num
         with open("last_debtor_company_number.txt", "w") as f:
             # write in file old debtor number
             f.write(invoices.find_one({"invoiceId": server_data["InvoiceId"]})["DebtorCompanyNumber"])
@@ -289,6 +288,8 @@ class ChangeAmount(Resource):
         message, code = validate_schema_caller(server_data, "schema_change_amount")
         if code != HTTPStatus.OK:
             return jsonify({"Message": message, "Code": code})
+        if server_data["amount"] <= 0:
+            return jsonify({"Message": "Amount cannot be negative number", "Code": HTTPStatus.BAD_REQUEST})
         invoice_id = server_data["invoiceId"]
         if not invoice_exist("invoiceId", invoice_id):
             return jsonify({"Message": "Invoice does not exist.", "Code": HTTPStatus.BAD_REQUEST})
