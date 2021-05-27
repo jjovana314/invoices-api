@@ -3,7 +3,7 @@ import requests
 from http import HTTPStatus
 
 
-url = "http://127.0.0.1:5000/api/invoice/"
+url = "http://127.0.0.1:5000/api/invoice"
 
 
 def test_idf_ok():
@@ -41,7 +41,7 @@ def test_multiple_requests():
     first_invoice = 16
     last_invoice = 21
     idf_list = [f"19{num}F" for num in range(first_invoice, last_invoice)]
-    path_list = [f"{url}{idf}" for idf in idf_list]
+    path_list = [f"{url}/{idf}" for idf in idf_list]
     for idx_path_invoice in range(len(path_list)-1):
         r = requests.get(path_list[idx_path_invoice])
         assert r.json()["liability"]["invoiceId"] == idf_list[idx_path_invoice]
