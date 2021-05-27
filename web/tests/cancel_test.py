@@ -9,7 +9,7 @@ headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 
 
 def test_cancel_invoice_ok():
-    invoice_id = "1932F"
+    invoice_id = "2011F"
     comment = "Invoice not valid"
     data = {"InvoiceId": invoice_id, "CancelComments": comment}
     response = {"Message": "Invoice canceled successfully", "Code": HTTPStatus.OK}
