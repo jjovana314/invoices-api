@@ -37,7 +37,6 @@ def test_invoice_register_ok():
 
 @pytest.mark.skip   # we have already tested this, it will fail because invoice already exists in database
 def test_invoice_register_multiple():
-    # invoice_ids = ["1851F", "1852F", "1853F", "1854F"]
     first_invoice = 11
     last_invoice = 16
     invoice_ids = [f"20{num}F" for num in range(first_invoice, last_invoice)]
@@ -147,11 +146,10 @@ def test_amount_not_ok():
 def test_dbt_number_register():
     first_invoice = 60
     last_invoice = 65
-    invoice_ids = [f"21{num}F" for num in range(first_invoice, last_invoice)]
     invoice_numbers = [f"Racun 21/{num}" for num in range(first_invoice, last_invoice)]
     dbt_numbers = [str(num) for num in range(20500, 20550)]
     amount = 600.52
-    for idx_invoice in range(len(invoice_ids)-1):
+    for idx_invoice in range(len(invoice_numbers)-1):
         for dbt_number in dbt_numbers:
             data = [
                 {
@@ -164,4 +162,5 @@ def test_dbt_number_register():
             ]
             r = requests.post(url, json=data, headers=headers)
             assert r.status_code == HTTPStatus.OK
-            assert r.json()["liabilityError"] == None
+            assert r.json(),get("Message") != f"Invoice with id {invoice_ids[idx_invoice]} already exist"
+            assert r.json().get("liabilityError") == None
