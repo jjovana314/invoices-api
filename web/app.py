@@ -332,7 +332,7 @@ class RevertAmount(Resource):
         server_data = request.get_json()
         message, code = validate_schema_caller(server_data, "schema_revert_amount")
         if code != HTTPStatus.OK:
-            return jsonify({"Messge": message, "Code": code})
+            return jsonify({"Message": message, "Code": code})
         try:
             id_ = server_data["id"]
         except KeyError:
