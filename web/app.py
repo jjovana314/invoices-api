@@ -193,7 +193,6 @@ class Register(Resource):
             else:
                 # if data is valid
                 validate_date_caller(curr_invoice)
-                issue_date = curr_invoice["IssueDate"]
                 liability["InvoiceNumber"].append(curr_invoice["InvoiceNumber"])
                 idf = register.generate_idf(curr_invoice["InvoiceNumber"])
                 idf_list.append(idf)
