@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from json import load, dumps, loads
 from jsonschema import ValidationError, validate
 from config import invoices, liability_error, liability, format_issue_date
+from resources.invoice_status import InvoiceStatus
 
 
 schema = dict()
@@ -133,3 +134,9 @@ def validate_date_time(format_datetime: str, date_time: str) -> datetime:
 def generate_idf(invoice_number):
     invoice_num_splited = invoice_number.split(" ")[1].split("/")
     return invoice_num_splited[0] + invoice_num_splited[1] + "F"
+
+
+def is_invalid_status_invoice(status_curr_idf):
+    return (status_curr_idf == InvoiceStatus.Canceled.code or
+            status_curr_idf == InvoiceStatus.Settled.code or
+            status_curr_idf == InvoiceStatus.Invalid.code)
