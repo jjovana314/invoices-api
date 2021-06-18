@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from flask import jsonify, request
 from flask_restful import Resource
-from helper import validate_schema_caller, generate_idf, invoice_exist
+from helper import validate_schema_caller, generate_idf, invoice_exist, is_invalid_status_invoice
 from config import invoices
 from resources.invoice_status import InvoiceStatus
 
@@ -42,9 +42,7 @@ class Validate(Resource):
                 }
                 return jsonify({"settlement": settlement, "settlementError": settlement_error})
             status_curr_idf = invoices.find_one({"invoiceId": curr_idf})["Status"]
-            if (status_curr_idf == InvoiceStatus.Canceled.code or
-                status_curr_idf == InvoiceStatus.Settled.code or
-                status_curr_idf == InvoiceStatus.Invalid.code):
+            if is_invalid_status_invoice(status_curr_idf):
                 settlement_error = {
                     "Message": "Invoice is invalid or canceled or settled",
                     "Code": HTTPStatus.BAD_REQUEST
