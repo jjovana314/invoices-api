@@ -37,6 +37,12 @@ def validate_schema(server_data: dict) -> None:
 
 
 def schema_generator(data: dict, schema_file_name: str) -> None:
+    """ Generate json schema for current data.
+
+    Arguments:
+        data {dict} -- data from user
+        schema_file_name {str} -- file where schema is located
+    """
     global schema
     schema_file_ext = schema_file_name + ".json"
     with open(schema_file_ext, "r") as f:
@@ -45,11 +51,20 @@ def schema_generator(data: dict, schema_file_name: str) -> None:
 
 
 def login_validation(server_data: dict) -> None:
+    """ Validate login information for current user.
+
+    Arguments:
+        server_data {dict} -- data from user
+
+    Raises:
+        LoginException: if login data is not valid
+    """
     if server_data.get("login") is None or server_data.get("password") is None:
         raise exceptions.LoginException
 
 
-def generate_date_time():
+def generate_date_time() -> datetime:
+    """ Generate date and time with timezone Europe/Belgrade. """
     tzone = pytz.timezone("Europe/Belgrade")
     time_with_zone = datetime.now(tzone)
     date_curr = time.localtime()
@@ -58,6 +73,16 @@ def generate_date_time():
 
 
 def login_exception_handler(server_data: dict, counter: int) -> bool:
+    """ Handle LoginException from login_validation function.
+
+    Arguments:
+        server_data {dict} -- data from user
+        couter {int} -- count how many times LoginException was raised
+
+    Returns:
+        Tuple with bool and counter value
+        (False if exception occured, True otherwise)  
+    """
     try:
         login_validation(server_data)
     except exceptions.LoginException:
@@ -65,6 +90,7 @@ def login_exception_handler(server_data: dict, counter: int) -> bool:
         return False, counter
     else:
         return True, counter
+
 
 def validate_date_caller(data: dict) -> None:
     """ Date validation and liability dictionaries update.
@@ -114,7 +140,8 @@ def invoice_exist(name_in_database: str, value: str) -> bool:
     return invoices.count_documents({name_in_database: value}) != 0
 
 
-def invalid_login_note():
+def invalid_login_note() -> None:
+    """ Wtite invalid login detatils in invalid_login_counter.txt file. """
     with open("invalid_login_counter.txt", "r") as f:
         invalid_login_counter = int(f.read())
     invalid_login_counter += 1
@@ -123,6 +150,15 @@ def invalid_login_note():
 
 
 def validate_date_time(format_datetime: str, date_time: str) -> datetime:
+    """ Date and time validation,
+
+    Arguments:
+        format_datetime {str} -- pattern for formating
+        date_time {str} -- date and time from user
+
+    Returns:
+        formated datetime object
+    """
     try:
         result = datetime.strptime(date_time, format_datetime)
     except ValueError:
@@ -131,12 +167,28 @@ def validate_date_time(format_datetime: str, date_time: str) -> datetime:
         return result
 
 
-def generate_idf(invoice_number):
+def generate_idf(invoice_number: str) -> str:
+    """ Creting invoice's IDF (id fakture - invoice's id)
+
+    Arguments:
+        invoice_number {str} -- invoice number from user
+
+    Returns:
+        genrated invoice's id
+    """
     invoice_num_splited = invoice_number.split(" ")[1].split("/")
     return invoice_num_splited[0] + invoice_num_splited[1] + "F"
 
 
-def is_invalid_status_invoice(status_curr_idf):
+def is_invalid_status_invoice(status_curr_idf: int):
+    """ Invoice status checking.
+
+    Arguments:
+        status_curr_idf {int} -- status of current invoice
+
+    Returns:
+        True if invoice is not valid, False if it is valid
+    """
     return (status_curr_idf == InvoiceStatus.Canceled.code or
             status_curr_idf == InvoiceStatus.Settled.code or
             status_curr_idf == InvoiceStatus.Invalid.code)
