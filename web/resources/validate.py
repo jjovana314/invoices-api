@@ -44,6 +44,11 @@ class Validate(Resource):
 
 
 def validate_bank_num(settled_invoice: dict) -> None:
+    """ Bank number validation.
+
+    Arguments:
+        settled_invoice {dict} -- current invoice
+    """
     global settlement_error
     global _bank_num
     if int(settled_invoice["bank"]) != _bank_num:
@@ -51,6 +56,11 @@ def validate_bank_num(settled_invoice: dict) -> None:
 
 
 def update_settlement_error_if_invoice_exist(idf: str) -> None:
+    """ Check if invoice exist in database and update settlement_error.
+
+    Arguments:
+        idf {str} -- invoice id
+    """
     global settlement_error
     if not invoice_exist("invoiceId", idf):
         settlement_error = {
@@ -60,6 +70,12 @@ def update_settlement_error_if_invoice_exist(idf: str) -> None:
 
 
 def validate_amount(settled_amount: int, amount: int) -> None:
+    """ User's amount validation.
+
+    Arguments:
+        settled_amount {int} -- amount from database
+        amount {int} -- amount from user
+    """
     global settlement_error
     if settled_amount > amount:
         settlement_error = {
@@ -69,6 +85,11 @@ def validate_amount(settled_amount: int, amount: int) -> None:
 
 
 def validate_status(status_curr_idf: int) -> None:
+    """ Invoice status validation
+
+    Arguments:
+        setatus_curr_idf {int} -- current invoice status
+    """
     if is_invalid_status_invoice(status_curr_idf):
         settlement_error = {
             "Message": "Invoice is invalid or canceled or settled",
