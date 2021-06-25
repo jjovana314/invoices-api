@@ -9,8 +9,8 @@ headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 
 @pytest.mark.skip       # we have already tested this, it will fail because invoice already exists in database
 def test_invoice_register_ok():
-    invoice_id = "1923F"
-    invoice_number = "Racun 19/23"
+    invoice_id = "2015F"
+    invoice_number = "Racun 20/15"
     data = [
         {
             "DebtorCompanyNumber": "10522",

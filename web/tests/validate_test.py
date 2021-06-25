@@ -11,35 +11,35 @@ headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 def test_validate_ok():
     data = [
         {
-            "debtorCompanyNumber": "10525",
+            "debtorCompanyNumber": "10522",
             "creditorCompanyNumber": "12",
             "creditorTaxIdNumber": "13",
-            "invoiceNumber": "Racun 18/25",
-            "settledAmount": 1000,
+            "invoiceNumber": "Racun 20/15",
+            "settledAmount": 10001,
             "bank": "840"
         },
         {
-            "debtorCompanyNumber": "10524",
+            "debtorCompanyNumber": "10522",
             "creditorCompanyNumber": "12",
             "creditorTaxIdNumber": "13",
-            "invoiceNumber": "Racun 18/26",
-            "settledAmount": 1002.32,
+            "invoiceNumber": "Racun 20/11",
+            "settledAmount": 10001.33,
             "bank": "840"
         }
     ]
     result = [
         {
-            "settlement": {"invoiceId": "1825F"},
+            "settlement": {"invoiceId": "2015F"},
             "settlementError": {}
         },
         {
-            "settlement": {"invoiceId": "1826F"},
+            "settlement": {"invoiceId": "2011F"},
             "settlementError": {}
         }
     ]
     r =  requests.post(url=url, json=data, headers=headers)
     for num_dictionaries in range(len(data) - 1):
-        assert r.json() == result
+        assert r.json() == result[num_dictionaries]
 
 
 def test_validate_schema_invalid():

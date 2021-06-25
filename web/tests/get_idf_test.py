@@ -38,9 +38,9 @@ def test_valid_id_liability():
 
 
 def test_multiple_requests():
-    first_invoice = 16
-    last_invoice = 21
-    idf_list = [f"19{num}F" for num in range(first_invoice, last_invoice)]
+    first_invoice = 60
+    last_invoice = 65
+    idf_list = [f"21{num}F" for num in range(first_invoice, last_invoice)]
     path_list = [f"{url}/{idf}" for idf in idf_list]
     for idx_path_invoice in range(len(path_list)-1):
         r = requests.get(path_list[idx_path_invoice])
