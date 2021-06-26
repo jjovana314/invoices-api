@@ -36,9 +36,9 @@ class Validate(Resource):
                 
                 status_curr_idf = invoices.find_one({"invoiceId": curr_idf})["Status"]
                 validate_status(status_curr_idf)
+                settlement = {"invoiceId": curr_idf}
             if len(list(settlement_error.values())) > 0:
                 return jsonify({"settlement": settlement, "settlementError": settlement_error})
-            settlement = {"invoiceId": curr_idf}
             result.append({"settlement": settlement, "settlementError": settlement_error})
         return jsonify(result)
 
