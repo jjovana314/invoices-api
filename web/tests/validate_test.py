@@ -15,7 +15,7 @@ def test_validate_ok():
             "creditorCompanyNumber": "12",
             "creditorTaxIdNumber": "13",
             "invoiceNumber": "Racun 20/15",
-            "settledAmount": 10001,
+            "settledAmount": 100,
             "bank": "840"
         },
         {
@@ -23,7 +23,7 @@ def test_validate_ok():
             "creditorCompanyNumber": "12",
             "creditorTaxIdNumber": "13",
             "invoiceNumber": "Racun 20/11",
-            "settledAmount": 10001.33,
+            "settledAmount": 20,
             "bank": "840"
         }
     ]
@@ -37,9 +37,8 @@ def test_validate_ok():
             "settlementError": {}
         }
     ]
-    r =  requests.post(url=url, json=data, headers=headers)
-    for num_dictionaries in range(len(data) - 1):
-        assert r.json() == result[num_dictionaries]
+    r = requests.post(url=url, json=data, headers=headers)
+    assert r.json() == result
 
 
 def test_validate_schema_invalid():
