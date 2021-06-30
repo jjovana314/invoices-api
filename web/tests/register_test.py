@@ -9,8 +9,8 @@ headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 
 @pytest.mark.skip       # we have already tested this, it will fail because invoice already exists in database
 def test_invoice_register_ok():
-    invoice_id = "2015F"
-    invoice_number = "Racun 20/15"
+    invoice_id = "2114F"
+    invoice_number = "Racun 21/14"
     data = [
         {
             "DebtorCompanyNumber": "10522",
@@ -37,10 +37,10 @@ def test_invoice_register_ok():
 
 @pytest.mark.skip   # we have already tested this, it will fail because invoice already exists in database
 def test_invoice_register_multiple():
-    first_invoice = 11
-    last_invoice = 16
-    invoice_ids = [f"20{num}F" for num in range(first_invoice, last_invoice)]
-    invoice_numbers = [f"Racun 20/{num}" for num in range(first_invoice, last_invoice)]
+    first_invoice = 10
+    last_invoice = 15
+    invoice_ids = [f"21{num}F" for num in range(first_invoice, last_invoice)]
+    invoice_numbers = [f"Racun 21/{num}" for num in range(first_invoice, last_invoice)]
     data = [
         {
             "DebtorCompanyNumber": "10522",
@@ -88,8 +88,8 @@ def test_invoice_register_multiple():
 
 @pytest.mark.skip   # we have already tested this, it will fail because invoice already exists in database
 def test_datetime_fail():
-    invoice_id = "1931F"
-    invoice_number = "Racun 19/31"
+    invoice_id = "2116F"
+    invoice_number = "Racun 21/16"
     date_invoice_invalid = "22.03.2020"
     data = [
         {
@@ -118,8 +118,8 @@ def test_datetime_fail():
 @pytest.mark.skip   # we have already tested this, it will fail because invoice already exists in database
 def test_amount_not_ok():
     amount_invalid = "0"
-    invoice_number = "Racun 19/32"
-    invoice_id = "1932F"
+    invoice_number = "Racun 21/17"
+    invoice_id = "2117F"
     data = [
         {
             "DebtorCompanyNumber": "10522",
@@ -143,24 +143,25 @@ def test_amount_not_ok():
     assert r.json() == response
 
 
+@pytest.mark.skip       # we have already tested this, it will fail because invoice already exists in database
 def test_dbt_number_register():
-    first_invoice = 60
-    last_invoice = 65
+    first_invoice = 31
+    last_invoice = 36
     invoice_numbers = [f"Racun 21/{num}" for num in range(first_invoice, last_invoice)]
-    dbt_numbers = [str(num) for num in range(20500, 20550)]
+    dbt_numbers = [str(num) for num in range(20500, 20505)]
     amount = 600.52
     for idx_invoice in range(len(invoice_numbers)-1):
-        for dbt_number in dbt_numbers:
-            data = [
-                {
-                    "DebtorCompanyNumber": dbt_number,
-                    "InvoiceNumber": invoice_numbers[idx_invoice],
-                    "Amount": amount,
-                    "IssueDate": "2021-27-05",
-                    "Comments": f"Comment {idx_invoice+1}"
-                }
-            ]
-            r = requests.post(url, json=data, headers=headers)
-            assert r.status_code == HTTPStatus.OK
-            assert r.json(),get("Message") != f"Invoice with id {invoice_ids[idx_invoice]} already exist"
-            assert r.json().get("liabilityError") == None
+        data = [
+            {
+                "DebtorCompanyNumber": dbt_numbers[idx_invoice],
+                "InvoiceNumber": invoice_numbers[idx_invoice],
+                "Amount": amount,
+                "IssueDate": "2021-27-05",
+                "Comments": f"Comment {idx_invoice+1}"
+            }
+        ]
+        r = requests.post(url, json=data, headers=headers)
+        assert r.status_code == HTTPStatus.OK
+        assert r.json().get("Message") == None
+        assert r.json()["liability"]["InvoiceNumber"] == [invoice_numbers[idx_invoice]]
+
