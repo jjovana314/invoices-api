@@ -10,7 +10,7 @@ headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 
 
 def test_change_amount_ok():
-    invoice_id = "2013F"
+    invoice_id = "2101F"
     amount = 500
     comments = "Comment 1"
     data = {"invoiceId": invoice_id, "amount": amount, "comments": comments}
@@ -22,8 +22,8 @@ def test_change_amount_ok():
 
 
 def test_change_amount_ok_multiple():
-    first_invoice = 11
-    last_invoice = 16
+    first_invoice = 10
+    last_invoice = 15
     start_amount = 5000
     end_amount = 5005
     invoice_ids = [f"20{num}F" for num in range(first_invoice, last_invoice)]
@@ -39,8 +39,8 @@ def test_change_amount_ok_multiple():
 
 
 def test_change_amount_invalid_multiple():
-    first_invoice = 11
-    last_invoice = 16
+    first_invoice = 10
+    last_invoice = 15
     start_amount = 5000
     end_amount = 5005
     invoice_ids = [f"20{num}!@44F" for num in range(first_invoice, last_invoice)]
@@ -54,7 +54,7 @@ def test_change_amount_invalid_multiple():
 
 
 def test_change_amount_negative_value():
-    invoice_id = "2013F"
+    invoice_id = "2102F"
     amount = -500
     comments = "Comment 1"
     data = {"invoiceId": invoice_id, "amount": amount, "comments": comments}

@@ -9,9 +9,9 @@ headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 
 
 def test_assign_ok():
-    invoice_id = "1903F"
+    invoice_id = "2101F"
     contract_num = "10534"
-    dbt_number = "10524"
+    dbt_number = "10522"
     response = {"Code": HTTPStatus.OK, "Message": "Invoice assigned successfully"}
     data = {'InvoiceId': invoice_id, 'AssignmentContractNumber': contract_num, 'DebtorCompanyNumber': dbt_number}
 
@@ -32,11 +32,11 @@ def test_assign_invoice_not_exist():
 
 
 def test_assign_multiple_invoice():
-    first_invoice_num = 11
-    last_invoice_num = 16
-    invoice_id_list = [f"20{invoice_num}F" for invoice_num in range(first_invoice_num, last_invoice_num)]
-    contract_num = "10522"
-    dbt_number = "10524"
+    first_invoice_num = 10
+    last_invoice_num = 15
+    invoice_id_list = [f"21{invoice_num}F" for invoice_num in range(first_invoice_num, last_invoice_num)]
+    contract_num = "10534"
+    dbt_number = "10522"
     for idx_invoice in range(len(invoice_id_list)-1):
         data = {
             "InvoiceId": invoice_id_list[idx_invoice],
@@ -50,9 +50,9 @@ def test_assign_multiple_invoice():
 
 
 def test_assign_not_valid_multiple_invoice():
-    first_invoice_num = 11
-    last_invoice_num = 16
-    invoice_id_list = [f"20{invoice_num}AAA*$" for invoice_num in range(first_invoice_num, last_invoice_num)]
+    first_invoice_num = 10
+    last_invoice_num = 15
+    invoice_id_list = [f"21{invoice_num}AAA*$" for invoice_num in range(first_invoice_num, last_invoice_num)]
     contract_num = "10522"
     dbt_number = "10524"
     for idx_invoice in range(len(invoice_id_list)-1):
