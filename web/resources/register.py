@@ -8,8 +8,6 @@ from helper import validate_schema_caller, invoice_exist, validate_date_caller, 
 
 max_invoices_request = 1000
 
-liability_error["InvoiceNumber"] = []
-liability["InvoiceNumber"] = []
 liability_error["LimitError"] = None
 liability_error["SchemaError"] = None
 
@@ -21,6 +19,8 @@ class Register(Resource):
         global liability
         global liability_error
         global max_invoices_request
+        liability_error["InvoiceNumber"] = []
+        liability["InvoiceNumber"] = []
 
         result_dict = dict()
         idf_list = []       # list with invoces id
@@ -35,7 +35,7 @@ class Register(Resource):
                 else:
                     # if data is valid
                     validate_date_caller(curr_invoice)
-                    liability["InvoiceNumber"].append(curr_invoice["InvoiceNumber"])
+                    liability["InvoiceNumber"].append(curr_invoice.get("InvoiceNumber"))
                     idf = generate_idf(curr_invoice["InvoiceNumber"])
                     idf_list.append(idf)
                     if invoice_exist("invoiceId", idf):
