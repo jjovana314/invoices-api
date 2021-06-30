@@ -106,8 +106,6 @@ def validate_date_caller(data: dict) -> None:
         date_formated = validate_date_time(format_issue_date, issue_date)
     except ValueError:
         liability_error["InvoiceNumber"].append(invoice_number)
-    else:
-        liability["InvoiceNumber"].append(invoice_number)
 
 
 def validate_schema_caller(data_validation: dict, schema_name: str) -> tuple:
