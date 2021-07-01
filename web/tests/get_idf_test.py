@@ -7,7 +7,7 @@ url = "http://127.0.0.1:5000/api/invoice"
 
 
 def test_idf_ok():
-    invoice_id = "1918F"
+    invoice_id = "2101F"
     full_get_path = f"{url}/{invoice_id}"
     r = requests.get(full_get_path)
     assert r.status_code == HTTPStatus.OK
@@ -30,7 +30,7 @@ def test_invalid_idf_format():
 
 
 def test_valid_id_liability():
-    idf = "1923F"
+    idf = "2114F"
     full_get_path = f"{url}/{idf}"
     r = requests.get(full_get_path)
     assert r.json()["liability"]["invoiceId"] == idf
@@ -38,8 +38,8 @@ def test_valid_id_liability():
 
 
 def test_multiple_requests():
-    first_invoice = 60
-    last_invoice = 65
+    first_invoice = 31
+    last_invoice = 36
     idf_list = [f"21{num}F" for num in range(first_invoice, last_invoice)]
     path_list = [f"{url}/{idf}" for idf in idf_list]
     for idx_path_invoice in range(len(path_list)-1):
