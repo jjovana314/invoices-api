@@ -8,32 +8,21 @@ url = "http://127.0.0.1:5000/api/invoice/validate"
 headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
 
 
+# @pytest.mark.skip       # we have already tested this, it will fail because invoice already exists in database
 def test_validate_ok():
     data = [
         {
             "debtorCompanyNumber": "10522",
             "creditorCompanyNumber": "12",
             "creditorTaxIdNumber": "13",
-            "invoiceNumber": "Racun 20/15",
+            "invoiceNumber": "Racun 21/14",
             "settledAmount": 100,
-            "bank": "840"
-        },
-        {
-            "debtorCompanyNumber": "10522",
-            "creditorCompanyNumber": "12",
-            "creditorTaxIdNumber": "13",
-            "invoiceNumber": "Racun 20/11",
-            "settledAmount": 20,
             "bank": "840"
         }
     ]
     result = [
         {
-            "settlement": {"invoiceId": "2015F"},
-            "settlementError": {}
-        },
-        {
-            "settlement": {"invoiceId": "2011F"},
+            "settlement": {"invoiceId": "2114F"},
             "settlementError": {}
         }
     ]
