@@ -28,15 +28,14 @@ class Validate(Resource):
                 
                 idf = generate_idf(settled_invoice["invoiceNumber"])
                 update_settlement_error_if_invoice_exist(idf)
-                
-                settled_amount = settled_invoice["settledAmount"]
-                curr_idf = generate_idf(settled_invoice["invoiceNumber"])
-                amount = invoices.find_one({"invoiceId": curr_idf})["Amount"]
-                validate_amount(settled_amount, amount)
-                
-                status_curr_idf = invoices.find_one({"invoiceId": curr_idf})["Status"]
-                validate_status(status_curr_idf)
-                settlement = {"invoiceId": curr_idf}
+                if list(settlement_error.values()) == 0:        # if invoice exist in database
+                    settled_amount = settled_invoice["settledAmount"]
+                    # curr_idf = generate_idf(settled_invoice["invoiceNumber"])
+                    amount = invoices.find_one({"invoiceId": curr_idf})["Amount"]
+                    validate_amount(settled_amount, amount)
+                    status_curr_idf = invoices.find_one({"invoiceId": curr_idf})["Status"]
+                    validate_status(status_curr_idf)
+                settlement = {"invoiceId": idf}
             if len(list(settlement_error.values())) > 0:
                 return jsonify({"settlement": settlement, "settlementError": settlement_error})
             result.append({"settlement": settlement, "settlementError": settlement_error})
