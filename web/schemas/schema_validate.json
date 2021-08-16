@@ -8,5 +8,10 @@
         "settledAmount": {"type": "number"},
         "bank": {"type": "string"}
     },
-    "required": ["debtorCompanyNumber", "creditorCompanyNumber", "creditorTaxIdNumber", "invoiceNumber", "settledAmount", "bank"]
+    "required": ["debtorCompanyNumber",
+                "creditorCompanyNumber",
+                "creditorTaxIdNumber",
+                "invoiceNumber",
+                "settledAmount",
+                "bank"]
 }

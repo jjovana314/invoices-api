@@ -1,8 +1,0 @@
-{
-    "type": "object",
-    "properties": {
-        "id": {"type": "integer"},
-        "cancelComments": {"type": "string"}
-    },
-    "required": ["id"]
-}

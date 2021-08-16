@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "properties": {
+    "InvoiceId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "InvoiceId"
+  ]
+}

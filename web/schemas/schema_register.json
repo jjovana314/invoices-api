@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "properties": {
+    "DebtorCompanyNumber": {
+      "type": "string"
+    },
+    "InvoiceNumber": {
+      "type": "string"
+    },
+    "Amount": {
+      "type": "number"
+    },
+    "IssueDate": {
+      "type": "string"
+    },
+    "Comments": {
+      "type": "string"
+    },
+    "Lifetime": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "DebtorCompanyNumber",
+    "InvoiceNumber",
+    "Amount",
+    "IssueDate"
+  ],
+  "additionalProperties": false
+}

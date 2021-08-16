@@ -1,9 +1,0 @@
-{
-    "type": "object",
-    "properties": {
-        "invoiceId": {"type": "string"},
-        "amount": {"type": "number"},
-        "comments": {"type": "string"}
-    },
-    "required": ["invoiceId", "amount", "comments"]
-}
