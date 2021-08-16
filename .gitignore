@@ -1,1 +1,4 @@
 web/tests/__pycache__/
+.idea/
+.venv/
+.vscode/
