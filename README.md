@@ -20,3 +20,7 @@ $ sudo docker-compose up
 - [Postman](https://www.postman.com/)
 - [Git](https://git-scm.com/)
 - [Github](https://github.com/)
+
+## Author
+
+- [Jovana Jovanović](https://github.com/jjovana314/)
