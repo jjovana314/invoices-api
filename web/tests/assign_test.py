@@ -3,74 +3,69 @@ import requests
 from json import dumps, loads
 from http import HTTPStatus
 
-
 url = "http://127.0.0.1:5000/api/invoice/assign"
-headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
+headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
 
-@pytest.mark.skip   # we have already tested this, it will fail because invoice already exists in database
 def test_assign_ok():
-  """ Test assignation with one invoice. """
-  invoice_id = "2101F"
-  contract_num = "10534"
-  dbt_number = "10522"
-  response = {"Code": HTTPStatus.OK, "Message": "Invoice assigned successfully"}
-  data = {'InvoiceId': invoice_id, 'AssignmentContractNumber': contract_num, 'DebtorCompanyNumber': dbt_number}
-
-  r = requests.post(url, json=data, headers=headers)
-  assert r.status_code == HTTPStatus.OK
-  assert r.json() == response
-
-
-@pytest.mark.skip   # we have already tested this, it will fail because invoice already exists in database
-def test_assign_invoice_not_exist():
-  """ Test assignation with invoice that not exists. """
-  invoice_id = "AAA00"
-  contract_num = "10534"
-  dbt_number = "10524"
-  data = {'InvoiceId': invoice_id, 'AssignmentContractNumber': contract_num, 'DebtorCompanyNumber': dbt_number}
-  r = requests.post(url, json=data, headers=headers)
-  response = {"Message": f"Invoice with id {invoice_id} does not exist", "Code": HTTPStatus.BAD_REQUEST}
-  assert r.status_code == HTTPStatus.OK
-  assert r.json() == response
-
-
-@pytest.mark.skip   # we have already tested this, it will fail because invoice already exists in database
-def test_assign_multiple_invoice():
-  first_invoice_num = 10
-  last_invoice_num = 15
-  invoice_id_list = [f"21{invoice_num}F" for invoice_num in range(first_invoice_num, last_invoice_num)]
-  contract_num = "10534"
-  dbt_number = "10522"
-  for idx_invoice in range(len(invoice_id_list)-1):
-    data = {
-      "InvoiceId": invoice_id_list[idx_invoice],
-      "AssignmentContractNumber": contract_num,
-      "DebtorCompanyNumber": dbt_number
-    }
-    r = requests.post(url, json=data, headers=headers)
+    """ Test assignation with one invoice. """
+    invoice_id = "2114F"
+    contract_num = "10534"
+    dbt_number = "10522"
     response = {"Code": HTTPStatus.OK, "Message": "Invoice assigned successfully"}
-    assert r.status_code == HTTPStatus.OK
-    assert r.json() == response
+    data = {'InvoiceId': invoice_id, 'AssignmentContractNumber': contract_num, 'DebtorCompanyNumber': dbt_number}
 
-
-@pytest.mark.skip   # we have already tested this, it will fail because invoice already exists in database
-def test_assign_not_valid_multiple_invoice():
-  first_invoice_num = 10
-  last_invoice_num = 15
-  invoice_id_list = [f"21{invoice_num}AAA*$" for invoice_num in range(first_invoice_num, last_invoice_num)]
-  contract_num = "10522"
-  dbt_number = "10524"
-  for idx_invoice in range(len(invoice_id_list)-1):
-    data = {
-      "InvoiceId": invoice_id_list[idx_invoice],
-      "AssignmentContractNumber": contract_num,
-      "DebtorCompanyNumber": dbt_number
-    }
     r = requests.post(url, json=data, headers=headers)
-    response = {
-      "Code": HTTPStatus.BAD_REQUEST,
-      "Message": f"Invoice with id {invoice_id_list[idx_invoice]} does not exist"
-    }
     assert r.status_code == HTTPStatus.OK
     assert r.json() == response
+
+
+def test_assign_invoice_not_exist():
+    """ Test assignation with invoice that not exists. """
+    invoice_id = "AAA00"
+    contract_num = "10534"
+    dbt_number = "10524"
+    data = {'InvoiceId': invoice_id, 'AssignmentContractNumber': contract_num, 'DebtorCompanyNumber': dbt_number}
+    r = requests.post(url, json=data, headers=headers)
+    response = {"Message": f"Invoice with id {invoice_id} does not exist", "Code": HTTPStatus.BAD_REQUEST}
+    assert r.status_code == HTTPStatus.OK
+    assert r.json() == response
+
+
+def test_assign_multiple_invoice():
+    first_invoice_num = 10
+    last_invoice_num = 15
+    invoice_id_list = [f"21{invoice_num}F" for invoice_num in range(first_invoice_num, last_invoice_num)]
+    contract_num = "10534"
+    dbt_number = "10522"
+    for idx_invoice in range(len(invoice_id_list) - 1):
+        data = {
+            "InvoiceId": invoice_id_list[idx_invoice],
+            "AssignmentContractNumber": contract_num,
+            "DebtorCompanyNumber": dbt_number
+        }
+        r = requests.post(url, json=data, headers=headers)
+        response = {"Code": HTTPStatus.OK, "Message": "Invoice assigned successfully"}
+        assert r.status_code == HTTPStatus.OK
+        assert r.json() == response
+
+
+def test_assign_not_valid_multiple_invoice():
+    first_invoice_num = 10
+    last_invoice_num = 15
+    invoice_id_list = [f"21{invoice_num}AAA*$" for invoice_num in range(first_invoice_num, last_invoice_num)]
+    contract_num = "10522"
+    dbt_number = "10524"
+    for idx_invoice in range(len(invoice_id_list) - 1):
+        data = {
+            "InvoiceId": invoice_id_list[idx_invoice],
+            "AssignmentContractNumber": contract_num,
+            "DebtorCompanyNumber": dbt_number
+        }
+        r = requests.post(url, json=data, headers=headers)
+        response = {
+            "Code": HTTPStatus.BAD_REQUEST,
+            "Message": f"Invoice with id {invoice_id_list[idx_invoice]} does not exist"
+        }
+        assert r.status_code == HTTPStatus.OK
+        assert r.json() == response
