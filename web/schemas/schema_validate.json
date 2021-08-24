@@ -1,17 +1,31 @@
 {
-    "type": "object",
-    "properties": {
-        "debtorCompanyNumber": {"type": "string"},
-        "creditorCompanyNumber": {"type": "string"},
-        "creditorTaxIdNumber": {"type": "string"},
-        "invoiceNumber": {"type": "string"},
-        "settledAmount": {"type": "number"},
-        "bank": {"type": "string"}
+  "type": "object",
+  "properties": {
+    "debtorCompanyNumber": {
+      "type": "string"
     },
-    "required": ["debtorCompanyNumber",
-                "creditorCompanyNumber",
-                "creditorTaxIdNumber",
-                "invoiceNumber",
-                "settledAmount",
-                "bank"]
+    "creditorCompanyNumber": {
+      "type": "string"
+    },
+    "creditorTaxIdNumber": {
+      "type": "string"
+    },
+    "invoiceNumber": {
+      "type": "string"
+    },
+    "settledAmount": {
+      "type": "number"
+    },
+    "bank": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "debtorCompanyNumber",
+    "creditorCompanyNumber",
+    "creditorTaxIdNumber",
+    "invoiceNumber",
+    "settledAmount",
+    "bank"
+  ]
 }
