@@ -7,6 +7,7 @@ from config import invoices
 
 _bank_num = 840  # this value is constant
 # todo: post method needs to be refactored
+# todo: update documentation
 
 
 class Validate(Resource):
