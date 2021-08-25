@@ -63,9 +63,13 @@ class Validate(Resource):
 def validate_bank_num(settled_invoice: dict) -> dict:
     """ Bank number validation.
 
-  Arguments:
-      settled_invoice {dict} -- current invoice
-  """
+    Arguments:
+        settled_invoice {dict} -- current invoice
+
+    Returns:
+        dictionary with error message and code if settled_invoice is not
+        valid, None otherwise
+    """
     global _bank_num
     if int(settled_invoice["bank"]) != _bank_num:
         return {
@@ -77,9 +81,13 @@ def validate_bank_num(settled_invoice: dict) -> dict:
 def update_settlement_error_if_invoice_not_exist(idf: str) -> dict:
     """ Check if invoice exist in database and update settlement_error.
 
-  Arguments:
-      idf {str} -- invoice id
-  """
+    Arguments:
+        idf {str} -- invoice id
+
+    Returns:
+        dictionary with error message and code if settled_invoice is not
+        valid, None otherwise
+    """
     if not invoices.find_one({"invoiceId": idf}):
         return {
             "Message": f"Invoice with id {idf} does not exist",
@@ -90,13 +98,17 @@ def update_settlement_error_if_invoice_not_exist(idf: str) -> dict:
 def validate_amount(settled_amount: int, amount: int) -> dict:
     """ User's amount validation.
 
-  Arguments:
-      settled_amount {int} -- amount from database
-      amount {int} -- amount from user
-  """
+    Arguments:
+        settled_amount {int} -- amount from database
+        amount {int} -- amount from user
+
+    Returns:
+        dictionary with error message and code if settled_invoice is not
+        valid, None otherwise
+    """
     if settled_amount > amount:
         return {
-            "Message": "setteled amount cannot be greather than invoice amount",
+            "Message": "settled amount cannot be greater than invoice amount",
             "Code": HTTPStatus.BAD_REQUEST
         }
 
@@ -104,9 +116,13 @@ def validate_amount(settled_amount: int, amount: int) -> dict:
 def validate_status(status_curr_idf: int) -> dict:
     """ Invoice status validation
 
-  Arguments:
-      status_curr_idf {int} -- current invoice status
-  """
+    Arguments:
+        status_curr_idf {int} -- current invoice status
+
+    Returns:
+        dictionary with error message and code if settled_invoice is not
+        valid, None otherwise
+    """
     if is_invalid_status_invoice(status_curr_idf):
         return {
             "Message": "Invoice is invalid or canceled or settled",
