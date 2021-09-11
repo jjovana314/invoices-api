@@ -1,11 +1,16 @@
 from http import HTTPStatus
 from flask import jsonify, request
 from flask_restful import Resource
-from helper import validate_schema_caller, generate_idf, is_invalid_status_invoice
+from helper import (
+    validate_schema_caller,
+    generate_idf,
+    is_invalid_status_invoice
+)
 from config import invoices
 
-
 _bank_num = 840  # this value is constant
+
+
 # todo: post method needs to be refactored
 # todo: update documentation
 
