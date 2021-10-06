@@ -1,30 +1,63 @@
 {
-  "type": "object",
-  "properties": {
-    "DebtorCompanyNumber": {
-      "type": "string"
+    "type": "object",
+    "properties": {
+        "CompanyName": {
+            "type": "string"
+        },
+        "BankAccount": {
+            "type": "string"
+        },
+        "InvoiceFor": {
+            "type": "object",
+            "properties": {
+                "CustomerName": "string",
+                "CustomerEmail": "string"
+            },
+            "required": [
+                "CustomerName",
+                "CustomerEmail"
+            ]
+        },
+        "InvoiceNumber": {
+            "type": "string"
+        },
+        "Items": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "Item": "string",
+                    "Quantity": "integer",
+                    "Price": "number"
+                },
+                "required": [
+                    "Item",
+                    "Quantity",
+                    "Price"
+                ]
+            }
+        },
+        "Subtotal": {
+            "type": "number"
+        },
+        "Tax": {
+            "type": "number"
+        },
+        "IssueDate": {
+            "type": "string"
+        },
+        "Note": {
+            "type": "string"
+        },
+        "Lifetime": {
+            "type": "integer"
+        }
     },
-    "InvoiceNumber": {
-      "type": "string"
-    },
-    "Amount": {
-      "type": "number"
-    },
-    "IssueDate": {
-      "type": "string"
-    },
-    "Comments": {
-      "type": "string"
-    },
-    "Lifetime": {
-      "type": "integer"
-    }
-  },
-  "required": [
-    "DebtorCompanyNumber",
-    "InvoiceNumber",
-    "Amount",
-    "IssueDate"
-  ],
-  "additionalProperties": false
+    "required": [
+        "DebtorCompanyNumber",
+        "InvoiceNumber",
+        "Amount",
+        "IssueDate"
+    ],
+    "additionalProperties": false
 }
